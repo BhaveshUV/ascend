@@ -1,0 +1,15 @@
+{
+  "name": "frontend",
+  "directory":"frontend",
+  "version": "1.0.0",
+  "description": "ascend frontend / client interface",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bhavesh",
+  "license": "ISC",
+  "browserslist": [
+    "last 2 chrome versions"
+  ]
+}

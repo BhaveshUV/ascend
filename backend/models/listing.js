@@ -13,7 +13,11 @@ let listingSchema = new mongoose.Schema({
     },
     price: Number,
     location: String,
-    country: String
+    country: String,
+    by: {
+        type: String,
+        required: true
+    }
 });
 
 const Listing = mongoose.model("Listing", listingSchema);

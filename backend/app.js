@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const Listing = require("./models/listing");
+const cors = require("cors");
 
 //---------------- Set up MongoDB database connection ----------------//
 async function main() {
@@ -14,8 +15,22 @@ main()
 //---------------- Set up Express server and API routes ----------------//
 const app = express();
 
+//--------------- Enable CORS for all incoming requests ---------------//
+app.use(cors({
+    origin: "http://localhost:1234" // Parcel development phase
+}));
+
 app.get("/api", (req, res) => {
     res.send("This is the root GET API and it's working :)");
+});
+
+app.get("/api/listings", async (req, res) => {
+    try {
+        const allListings = await Listing.find({});
+        res.json(allListings);
+    } catch (e) {
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 });
 
 app.get("/api/testListing", (req, res) => {

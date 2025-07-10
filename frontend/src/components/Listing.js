@@ -1,22 +1,36 @@
-import { Link } from "react-router";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router";
+import { LISTING_PREFIX_URL } from "../utils/constants";
 
-const Listing = ({ listing }) => {
-    const { _id, title, price, location, country, image, by } = listing;
+const Listing = () => {
+    const [listing, setListing] = useState(null);
+    const [error, setError] = useState(null);
 
-    return (
-        <Link to={`/listings/${_id}`}>
-            <div className="w-xs max-w-md 2xl:w-md grow rounded shadow-2xl bg-[#fedf4b10] cursor-pointer">
-                <img className="w-full h-64 object-cover bg-zinc-300 rounded-t" src={image} alt={title} />
-                <div className="px-6 py-4">
-                    <h2 className="font-bold text-xl mb-2">{title}</h2>
-                    <p className="text-gray-900 font-semibold">Price: ₹{price.toLocaleString("en-IN")}</p>
-                    <p className="text-gray-700">Location: {location}</p>
-                    <p className="text-gray-700">Country: {country}</p>
-                    <p className="text-gray-700 font-semibold">{by}</p>
-                </div>
-            </div>
-        </Link>
-    );
+    const { id } = useParams();
+    useEffect(() => {
+        fetchListing();
+    }, []);
+
+    let fetchListing = async () => {
+        try {
+            let res = await fetch(LISTING_PREFIX_URL + id);
+            console.log(res);
+            if (!res.ok) {
+                let err = await res.json();
+                console.log("Fetch failed: ", err);
+                setError(err);
+                return;
+            }
+            let data = await res.json();
+            console.log(data);
+            setListing(data);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    if(error) return <div>Oops, we can't find the page you are looking for.</div>
+    return !listing ? <div>Fetching the listing...</div> : <div>{listing.title}</div>
 }
 
 export default Listing;

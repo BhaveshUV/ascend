@@ -33,6 +33,22 @@ app.get("/api/listings", async (req, res) => {
     }
 });
 
+app.get("/api/listings/:id", async (req, res) => {
+    try{
+        const { id } = req.params;
+        if(!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid ID format" });
+        }
+        const listing = await Listing.findById(id);
+        if(!listing) {
+            res.status(404).json({error: "Listing not found!"});
+        }
+        res.json(listing);
+    } catch (e) {
+        res.status(500).json({error: e});
+    }
+});
+
 app.get("/api/testListing", (req, res) => {
     let testListing = new Listing({
         title: "Test-title",

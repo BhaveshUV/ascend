@@ -3,7 +3,7 @@ import Header from "./components/Header";
 
 const App = () => {
     return (
-        <div>
+        <div className="flex flex-col flex-1">
             <Header />
             <Outlet />
         </div>

@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 const ListingCard = ({ listing }) => {
     const { _id, title, price, location, country, image, by } = listing;

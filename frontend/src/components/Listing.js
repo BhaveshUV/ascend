@@ -1,36 +1,29 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router";
-import { LISTING_PREFIX_URL } from "../utils/constants";
+import { useLoaderData, Await } from "react-router";
+import { Suspense } from "react";
 
 const Listing = () => {
-    const [listing, setListing] = useState(null);
-    const [error, setError] = useState(null);
+    const { listing } = useLoaderData();
 
-    const { id } = useParams();
-    useEffect(() => {
-        fetchListing();
-    }, []);
-
-    let fetchListing = async () => {
-        try {
-            let res = await fetch(LISTING_PREFIX_URL + id);
-            console.log(res);
-            if (!res.ok) {
-                let err = await res.json();
-                console.log("Fetch failed: ", err);
-                setError(err);
-                return;
-            }
-            let data = await res.json();
-            console.log(data);
-            setListing(data);
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    if(error) return <div>Oops, we can't find the page you are looking for.</div>
-    return !listing ? <div>Fetching the listing...</div> : <div>{listing.title}</div>
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <Await resolve={listing}>
+                {
+                    (listing) => (
+                        <div className="m-auto w-full grow flex flex-col md:flex-row rounded shadow-2xl cursor-default">
+                            <img className={`md:w-[50%] aspect-[16/12] bg-zinc-300 rounded-t object-cover object-center`} src={listing.image} alt={listing.title} />
+                            <div className="md:w-[50%] px-6 py-4 h-full">
+                                <h2 className="font-bold text-xl mb-2">{listing.title}</h2>
+                                <p className="text-gray-700">{listing.description}</p>
+                                <p className="text-gray-900 font-semibold">Price: ₹{listing.price.toLocaleString("en-IN")}</p>
+                                <p className="text-gray-700">Location: {listing.location}</p>
+                                <p className="text-gray-700">Country: {listing.country}</p>
+                            </div>
+                        </div>
+                    )
+                }
+            </Await>
+        </Suspense>
+    )
 }
 
 export default Listing;

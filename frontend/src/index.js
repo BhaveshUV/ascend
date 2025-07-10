@@ -2,11 +2,12 @@
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AllListings from "./components/AllListings";
 import Error from "./components/Error";
 import Background from "./components/Background";
 import Listing from "./components/Listing";
+import listingLoader from "./loaders/listingLoader";
 
 let appRouter = createBrowserRouter([
     {
@@ -24,7 +25,8 @@ let appRouter = createBrowserRouter([
                     },
                     {
                         path: "/listings/:id",
-                        element: <Listing />
+                        element: <Listing />,
+                        loader: listingLoader
                     }
                 ]
             }

@@ -5,8 +5,8 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AllListings from "./components/AllListings";
 import Error from "./components/Error";
-import Background from "./components/Background";
 import Listing from "./components/Listing";
+import EditListing from "./components/EditListing";
 import listingLoader from "./loaders/listingLoader";
 
 let appRouter = createBrowserRouter([
@@ -16,19 +16,18 @@ let appRouter = createBrowserRouter([
         errorElement: <Error />,
         children: [
             {
-                path: "/",
-                element: <Background />,
-                children: [
-                    {
-                        path: "/listings",
-                        element: <AllListings />
-                    },
-                    {
-                        path: "/listings/:id",
-                        element: <Listing />,
-                        loader: listingLoader
-                    }
-                ]
+                path: "/listings",
+                element: <AllListings />
+            },
+            {
+                path: "/listings/:id",
+                element: <Listing />,
+                loader: listingLoader
+            },
+            {
+                path: "/listings/:id/edit",
+                element: <EditListing />,
+                loader: listingLoader
             }
         ]
     }

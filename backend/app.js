@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Listing = require("./models/listing");
 const cors = require("cors");
+const methodOverride = require("method-override");
 
 //---------------- Set up MongoDB database connection ----------------//
 async function main() {
@@ -15,10 +16,16 @@ main()
 //---------------- Set up Express server and API routes ----------------//
 const app = express();
 
-//--------------- Enable CORS for all incoming requests ---------------//
+//---------------- Enable CORS for all incoming requests ----------------//
 app.use(cors({
     origin: "http://localhost:1234" // Parcel development phase
 }));
+
+//--- Enable server to use method-override for all incoming requests ---//
+app.use(methodOverride("_method"));
+
+//------------ Enable middlewares for all incoming requests ------------//
+app.use(express.json());
 
 app.get("/api", (req, res) => {
     res.send("This is the root GET API and it's working :)");
@@ -34,18 +41,18 @@ app.get("/api/listings", async (req, res) => {
 });
 
 app.get("/api/listings/:id", async (req, res) => {
-    try{
+    try {
         const { id } = req.params;
-        if(!mongoose.Types.ObjectId.isValid(id)) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: "Invalid ID format" });
         }
         const listing = await Listing.findById(id);
-        if(!listing) {
-            res.status(404).json({error: "Listing not found!"});
+        if (!listing) {
+            res.status(404).json({ error: "Listing not found!" });
         }
         res.json(listing);
     } catch (e) {
-        res.status(500).json({error: e});
+        res.status(500).json({ error: e });
     }
 });
 
@@ -65,6 +72,19 @@ app.get("/api/testListing", (req, res) => {
         })
         .catch(e => res.send(e));
 });
+
+app.patch("/api/listings/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        let result = await Listing.findOneAndUpdate({ _id: id }, req.body, { returnDocument: "after", runValidators: true });
+        if (!result) {
+            res.status(404).json({ error: "Listing not found!" });
+        }
+        res.status(200).send();
+    } catch (e) {
+        res.status(500).json({ error: e });
+    }
+})
 
 app.listen(8080, () => {
     console.log("App server is now listening on port 8080...");

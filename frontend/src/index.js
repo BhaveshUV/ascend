@@ -6,7 +6,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AllListings from "./components/AllListings";
 import Error from "./components/Error";
 import Listing from "./components/Listing";
-import EditListing from "./components/EditListing";
 import listingLoader from "./loaders/listingLoader";
 
 let appRouter = createBrowserRouter([
@@ -23,15 +22,10 @@ let appRouter = createBrowserRouter([
                 path: "/listings/:id",
                 element: <Listing />,
                 loader: listingLoader
-            },
-            {
-                path: "/listings/:id/edit",
-                element: <EditListing />,
-                loader: listingLoader
             }
         ]
     }
-])
+]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<RouterProvider router={appRouter} />);

@@ -84,7 +84,19 @@ app.patch("/api/listings/:id", async (req, res) => {
     } catch (e) {
         res.status(500).json({ error: e });
     }
-})
+});
+
+app.post("/api/listings", async (req, res) => {
+    try {
+        console.log("Recieved request.body: ", req.body);
+        const createdListing = await Listing.create(req.body);
+        console.log(createdListing);
+        if (!createdListing) return res.status(400).json({ error: "Invalid listing data. Could not create listing." });
+        res.status(201).json(createdListing);
+    } catch (e) {
+        res.status(500).json({ error: `Error adding new listing: ${e}` });
+    }
+});
 
 app.listen(8080, () => {
     console.log("App server is now listening on port 8080...");

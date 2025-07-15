@@ -36,6 +36,7 @@ app.get("/api/listings", async (req, res) => {
         const allListings = await Listing.find({});
         res.json(allListings);
     } catch (e) {
+        console.error(`Error fetching all the listings: ${e.message}`);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
@@ -52,7 +53,8 @@ app.get("/api/listings/:id", async (req, res) => {
         }
         res.json(listing);
     } catch (e) {
-        res.status(500).json({ error: e });
+        console.error(`Error fetching the listing: ${e.message}`);
+        res.status(500).json({ error: "An error occurred while fetching the listing. Please try again later." });
     }
 });
 
@@ -82,7 +84,8 @@ app.patch("/api/listings/:id", async (req, res) => {
         }
         res.status(200).send();
     } catch (e) {
-        res.status(500).json({ error: e });
+        console.error(`Error updating the listing: ${e}`);
+        res.status(500).json({ error: "An error occurred while updating the listing. Please try again later." });
     }
 });
 
@@ -94,7 +97,20 @@ app.post("/api/listings", async (req, res) => {
         if (!createdListing) return res.status(400).json({ error: "Invalid listing data. Could not create listing." });
         res.status(201).json(createdListing);
     } catch (e) {
-        res.status(500).json({ error: `Error adding new listing: ${e}` });
+        console.error(`Error adding the listing: ${e}`);
+        res.status(500).json({ error: "An error occurred while adding the listing. Please try again later." });
+    }
+});
+
+app.delete("/api/listings/:id", async (req, res) => {
+    try {
+        let { id } = req.params;
+        let deletedListing = await Listing.findOneAndDelete({ _id: id });
+        if (!deletedListing) return res.status(404).json({ error: "Listing not found" });
+        res.status(200).send();
+    } catch (e) {
+        console.error(`Error deleting the listing: ${e}`);
+        res.status(500).json({ error: "An error occurred while deleting the listing. Please try again later." });
     }
 });
 

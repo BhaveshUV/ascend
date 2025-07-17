@@ -2,7 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ALL_LISTINGS_URL } from "../utils/constants";
 
-const EditListing = ({ listing, setIsForm }) => {
+const ListingForm = ({ listing, setIsForm }) => {
+    if (!listing) {
+        listing = {};
+    }
     const [title, setTitle] = useState(listing.title || "");
     const [description, setDescription] = useState(listing.description || "");
     const [imgURL, setImgURL] = useState(listing.image || "");
@@ -12,7 +15,7 @@ const EditListing = ({ listing, setIsForm }) => {
 
     const navigate = useNavigate();
 
-    let submitHandler = async (e) => {
+    let editHandler = async (e) => {
         e.preventDefault();
         let updatedForm = { title, description, image: imgURL, price: amount, location, country };
         try {
@@ -49,8 +52,7 @@ const EditListing = ({ listing, setIsForm }) => {
                 body: JSON.stringify(form)
             });
             if (response.ok) {
-                navigate(0);
-                setIsForm(false);
+                navigate(-1);
                 window.alert("Listing created successfully")
                 return;
             }
@@ -75,8 +77,11 @@ const EditListing = ({ listing, setIsForm }) => {
     }
 
     return (
-        <form onSubmit={listing._id ? submitHandler : createHandler} className="flex flex-col items-center mx-auto py-4 px-6 gap-4 w-full sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] relative">
-            <button type="button" onClick={() => setIsForm(false)} className="rounded cursor-pointer absolute right-[2px] top-[-2px] sm:right-6 sm:top-0 text-3xl">&#11199;</button>
+        <form onSubmit={listing._id ? editHandler : createHandler} className="flex flex-col items-center mx-auto py-4 px-6 gap-4 w-full sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] relative">
+                <div onClick={() => { setIsForm ? setIsForm(false) : navigate(-1) }} className="absolute right-1 top-2 sm:right-6 h-6 w-6 border-3 rounded-full cursor-pointer flex flex-col justify-center items-center">
+                    <span className="absolute rotate-45 border-b-3 w-[0.8rem]"></span>
+                    <span className="absolute -rotate-45 border-b-3 w-[0.8rem]"></span>
+                </div>
             <div className="flex flex-col items-center">
                 <span className="font-bold text-xl text-center">{listing.by || "Default User"}</span>
                 <span className="font-semibold">{listing._id ? "Edit your Listing" : "Create your Listing"}</span>
@@ -107,10 +112,10 @@ const EditListing = ({ listing, setIsForm }) => {
             </div>
             <div className="mx-auto w-fit">
                 <button id="create-btn" className="bg-[#fedf4b] px-2 mx-2 rounded hover:border-2 box-border h-8 w-16 cursor-pointer">Save</button>
-                <button type="button" onClick={() => setIsForm(false)} className="bg-zinc-200 px-2 mx-2 rounded hover:border-2 box-border h-8 w-20 cursor-pointer">Cancel</button>
+                <button type="button" onClick={() => { setIsForm ? setIsForm(false) : navigate(-1) }} className="bg-zinc-200 px-2 mx-2 rounded hover:border-2 box-border h-8 w-20 cursor-pointer">Cancel</button>
             </div>
         </form>
     )
 }
 
-export default EditListing;
+export default ListingForm;

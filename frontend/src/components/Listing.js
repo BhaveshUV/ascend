@@ -1,6 +1,6 @@
 import { Suspense, useState } from "react";
 import { useLoaderData, Await, useNavigate } from "react-router-dom";
-import EditListing from "./EditListing";
+import ListingForm from "./ListingForm";
 import { ALL_LISTINGS_URL } from "../utils/constants";
 
 const Listing = () => {
@@ -34,7 +34,7 @@ const Listing = () => {
         <Suspense fallback={<div>Loading...</div>}>
             <Await resolve={listing}>
                 {(listing) => {
-                    return isForm ? <EditListing listing={listing} setIsForm={setIsForm} /> : <div className="m-auto w-full grow flex flex-col md:flex-row rounded shadow-2xl cursor-default relative">
+                    return isForm ? <ListingForm listing={listing} setIsForm={setIsForm} /> : <div className="m-auto w-full grow flex flex-col md:flex-row rounded shadow-2xl cursor-default relative">
                         <img className={`md:w-[50%] aspect-[16/12] bg-zinc-300 object-cover object-center`} src={listing.image} alt={listing.title} />
                         <div className="md:w-[50%] px-6 py-4 h-full">
                             <div className="flex mb-2 gap-4">

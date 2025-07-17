@@ -85,7 +85,7 @@ app.patch("/api/listings/:id", async (req, res) => {
         res.status(200).send();
     } catch (e) {
         console.error(`Error updating the listing: ${e}`);
-        res.status(500).json({ error: "An error occurred while updating the listing. Please try again later." });
+        res.status(500).json({ error: `Error updating the listing: ${e}`});
     }
 });
 
@@ -98,7 +98,7 @@ app.post("/api/listings", async (req, res) => {
         res.status(201).json(createdListing);
     } catch (e) {
         console.error(`Error adding the listing: ${e}`);
-        res.status(500).json({ error: "An error occurred while adding the listing. Please try again later." });
+        res.status(500).json({ error: `Error adding the listing: ${e}`});
     }
 });
 

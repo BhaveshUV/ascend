@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AllListings from "./components/AllListings";
 import Error from "./components/Error";
 import Listing from "./components/Listing";
+import ListingForm from "./components/ListingForm";
 import listingLoader from "./loaders/listingLoader";
 
 let appRouter = createBrowserRouter([
@@ -17,6 +18,10 @@ let appRouter = createBrowserRouter([
             {
                 path: "/listings",
                 element: <AllListings />
+            },
+            {
+                path: "/listings/new",
+                element: <ListingForm />
             },
             {
                 path: "/listings/:id",

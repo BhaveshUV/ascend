@@ -5,7 +5,10 @@ let listingSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    description: String,
+    description: {
+        type: String,
+        required: true
+    },
     image: {
         type: String,
         default: "https://cdn.pixabay.com/photo/2020/09/24/16/50/board-5599231_1280.png",

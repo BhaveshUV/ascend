@@ -1,13 +1,13 @@
-const logo = new URL('./ascend-logo-white.png', import.meta.url);
-import AllListings from "./components/AllListings";
+import Header from "./components/Header";
+import Background from "./components/Background";
+import Footer from "./components/Footer";
 
 const App = () => {
     return (
-        <div>
-            <div className="bg-zinc-800 py-4 px-2 sticky top-0">
-                <img src={logo} width={128} />
-            </div>
-            <AllListings />
+        <div className="flex flex-col flex-1">
+            <Header />
+            <Background />
+            <Footer />
         </div>
     );
 }

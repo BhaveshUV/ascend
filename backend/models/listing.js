@@ -38,6 +38,17 @@ let listingSchema = new mongoose.Schema({
     }
 });
 
+listingSchema.pre("findOneAndDelete", async function (next) {
+    console.log(`Pre Listing.findOneAndDelete() middleware called.`);
+});
+
+listingSchema.post("findOneAndDelete", async (deletedListing, next) => {
+    if (deletedListing) {
+        console.log(`Post Listing.findOneAndDelete() middleware called, and the listing is deleted`);
+    }
+    next();
+})
+
 const Listing = mongoose.model("Listing", listingSchema);
 
 module.exports = Listing;

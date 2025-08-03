@@ -139,6 +139,7 @@ app.delete("/api/listings/:id", async (req, res) => {
         let { id } = req.params;
         let deletedListing = await Listing.findOneAndDelete({ _id: id });
         if (!deletedListing) return res.status(404).json({ error: "Listing not found" });
+        await Review.deleteMany({ _id: { $in: deletedListing.reviews } });
         res.status(200).send();
     } catch (e) {
         console.error(`Error deleting the listing: ${e}`);

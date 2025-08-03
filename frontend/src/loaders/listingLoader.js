@@ -1,8 +1,8 @@
 import { defer } from "react-router-dom";
-import { LISTING_PREFIX_URL } from "../utils/constants";
+import { ALL_LISTINGS_URL } from "../utils/constants";
 
 const listingLoader = async ({ params }) => {
-    const res = await fetch(LISTING_PREFIX_URL + params.id);
+    const res = await fetch(ALL_LISTINGS_URL + "/" + params.id);
     if (!res.ok) {
         const err = await res.json();
         console.dir(err);

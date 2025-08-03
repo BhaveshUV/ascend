@@ -55,7 +55,7 @@ const Listing = () => {
                         </div>
                         {/* <div className="w-full h-12 bg-zinc-800"></div> */}
                         <ReviewForm />
-                        <Reviews />
+                        <Reviews listing={listing} />
                     </>
                 }}
             </Await>

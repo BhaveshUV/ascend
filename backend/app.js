@@ -49,7 +49,7 @@ app.get("/api/listings/:id", async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: "Invalid ID format" });
         }
-        const listing = await Listing.findById(id);
+        const listing = await Listing.findById(id).populate("reviews");
         if (!listing) {
             return res.status(404).json({ error: "Listing not found!" });
         }
@@ -126,7 +126,7 @@ app.post("/api/listings/:id/reviews", async (req, res) => {
         const review = await Review.create(req.body);
         if (!review) return res.status(400).json({ error: "Review creation failed!" });
         const updatedListing = await Listing.findByIdAndUpdate(id, { $push: { reviews: review._id } }, { returnDocument: "after" });
-        if (!updatedListing) return res.status(400).json({ error: "Failed to update listing with the new review" });
+        if (!updatedListing) return res.status(400).json({ error: "Review created but failed to update listing with the new review" });
         res.status(201).send();
     } catch (e) {
         console.error(`Error adding the review: ${e}`);
@@ -143,6 +143,20 @@ app.delete("/api/listings/:id", async (req, res) => {
     } catch (e) {
         console.error(`Error deleting the listing: ${e}`);
         res.status(500).json({ error: "An error occurred while deleting the listing. Please try again later." });
+    }
+});
+
+app.delete("/api/listings/:id/reviews/:reviewId", async (req, res) => {
+    try {
+        const { id, reviewId } = req.params;
+        const deletedReview = await Review.findByIdAndDelete(reviewId);
+        if (!deletedReview) return res.status(404).json({ error: "Review not found" });
+        const updatedListing = await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+        if (!updatedListing) return res.status(404).json({ error: "Review deleted but not the reference to it from listing: Couldn't find the listing" });
+        res.status(200).send();
+    } catch (e) {
+        console.error(`Error deleting the review or its reference in its listing: ${e}`);
+        res.status(500).json({ error: "An error occurred while deleting the review. Please try again later." });
     }
 });
 

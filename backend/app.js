@@ -1,8 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const Listing = require("./models/listing");
+const Review = require("./models/review");
 const cors = require("cors");
 const methodOverride = require("method-override");
+const { listingSchema } = require("./schemaValidation.js");
 
 //---------------- Set up MongoDB database connection ----------------//
 async function main() {
@@ -49,7 +51,7 @@ app.get("/api/listings/:id", async (req, res) => {
         }
         const listing = await Listing.findById(id);
         if (!listing) {
-            res.status(404).json({ error: "Listing not found!" });
+            return res.status(404).json({ error: "Listing not found!" });
         }
         res.json(listing);
     } catch (e) {
@@ -75,32 +77,62 @@ app.get("/api/testListing", (req, res) => {
         .catch(e => res.send(e));
 });
 
+const validateListing = (req, res) => {
+    let validity = listingSchema.validate({ listing: req.body });
+    console.dir(validity);
+    if (validity.error) {
+        let errMsg = validity.error.details.map((el) => el.message).join(", ");
+        return res.status(404).json({ error: errMsg });
+    }
+};
+
 app.patch("/api/listings/:id", async (req, res) => {
     try {
         const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid ID format" });
+        }
+        validateListing(req, res);
         let result = await Listing.findOneAndUpdate({ _id: id }, req.body, { returnDocument: "after", runValidators: true });
         if (!result) {
-            res.status(404).json({ error: "Listing not found!" });
+            return res.status(404).json({ error: "Listing not found!" });
         }
         res.status(200).send();
     } catch (e) {
         console.error(`Error updating the listing: ${e}`);
-        res.status(500).json({ error: `Error updating the listing: ${e}`});
+        res.status(500).json({ error: `Error updating the listing: ${e}` });
     }
 });
 
 app.post("/api/listings", async (req, res) => {
     try {
-        console.log("Recieved request.body: ", req.body);
+        validateListing(req, res);
+        console.log("Received request.body: ", req.body);
         const createdListing = await Listing.create(req.body);
-        console.log(createdListing);
-        if (!createdListing) return res.status(400).json({ error: "Invalid listing data. Could not create listing." });
-        res.status(201).json(createdListing);
+        if (!createdListing) return res.status(400).json({ error: "Listing creation failed!" });
+        res.status(201).send();
     } catch (e) {
         console.error(`Error adding the listing: ${e}`);
-        res.status(500).json({ error: `Error adding the listing: ${e}`});
+        res.status(500).json({ error: `Error adding the listing: ${e}` });
     }
 });
+
+app.post("/api/listings/:id/reviews", async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Listing not found!" });
+        }
+        const review = await Review.create(req.body);
+        if (!review) return res.status(400).json({ error: "Review creation failed!" });
+        const updatedListing = await Listing.findByIdAndUpdate(id, { $push: { reviews: review._id } }, { returnDocument: "after" });
+        if (!updatedListing) return res.status(400).json({ error: "Failed to update listing with the new review" });
+        res.status(201).send();
+    } catch (e) {
+        console.error(`Error adding the review: ${e}`);
+        res.status(500).json({ error: `Error adding the review: ${e}` });
+    }
+})
 
 app.delete("/api/listings/:id", async (req, res) => {
     try {

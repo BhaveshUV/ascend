@@ -18,8 +18,20 @@ let listingSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    location: String,
-    country: String,
+    location: {
+        type: String,
+        required: true
+    },
+    country: {
+        type: String,
+        required: true
+    },
+    reviews: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Review",
+        }
+    ],
     by: {
         type: String,
         required: true

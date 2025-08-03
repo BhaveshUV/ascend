@@ -22,11 +22,11 @@ const ListingForm = ({ listing, setIsForm }) => {
             });
             if (response.ok) {
                 navigate(0);
-                setIsForm(false);
                 window.alert("Update successful");
             } else {
                 const error = await response.json();
-                window.alert("Error updating the listing: ", error);
+                console.dir(error);
+                window.alert("Error updating the listing: " + error.error);
             }
         } catch (e) {
             window.alert("Request failed: ", e);
@@ -35,7 +35,6 @@ const ListingForm = ({ listing, setIsForm }) => {
 
     let createHandler = async (values) => {
         let { title, description, image, price, location, country } = values;
-        document.getElementById("create-btn").disabled = true;
         let form = { title, description, image, price, location, country, by: "Default-user" };
         try {
             const response = await fetch(ALL_LISTINGS_URL, {
@@ -51,9 +50,10 @@ const ListingForm = ({ listing, setIsForm }) => {
                 return;
             }
             let err = await response.json();
-            console.log(err);
+            console.dir(err);
             window.alert(err.error);
         } catch (e) {
+            console.dir(e);
             window.alert("Request failed: ", e);
         }
     }
@@ -81,17 +81,21 @@ const ListingForm = ({ listing, setIsForm }) => {
                     errors.description = 'Required';
                 } if (listing._id && !values.image) {
                     errors.image = 'Required';
-                } if (values.price <= 0) {
+                } if (!values.price && values.price!='0') {
+                    errors.price = 'Required';
+                } else if (values.price <= 0) {
                     errors.price = 'Enter a valid amount';
+                } if (!values.location) {
+                    errors.location = 'Required';
+                } if (!values.country) {
+                    errors.country = 'Required';
                 }
                 return errors;
             }}
             onSubmit={(values, { setSubmitting }) => {
-                setTimeout(() => {
-                    alert(JSON.stringify(values, null, 2));
-                    listing._id ? editHandler(values) : createHandler(values);
-                    setSubmitting(false);
-                }, 400);
+                alert("You've submitted: " + JSON.stringify(values, null, 2));
+                listing._id ? editHandler(values) : createHandler(values);
+                setSubmitting(false);
             }}
         >
             {({ isSubmitting }) => (
@@ -124,16 +128,18 @@ const ListingForm = ({ listing, setIsForm }) => {
                         <Field id="amount" type="number" name="price" onWheel={preventWheel} className="text-gray-700 px-1 w-full border-2 border-white focus:border-black bg-white text-center rounded" />
                         <ErrorMessage name="price" component="span" className="absolute -bottom-3.5 leading-none text-[smaller] w-full text-red-700 italic" />
                     </div>
-                    <div className="flex flex-col w-full h-max">
-                        <label className="w-fit" htmlFor="location">Location</label>
+                    <div className="flex flex-col w-full h-max relative">
+                        <label className="w-fit" htmlFor="location">Location <span className="text-red-700">*</span></label>
                         <Field id="location" type="text" name="location" className="text-gray-700 px-1 w-full border-2 border-white focus:border-black bg-white text-center rounded" />
+                        <ErrorMessage name="location" component="span" className="absolute -bottom-3.5 leading-none text-[smaller] w-full text-red-700 italic" />
                     </div>
-                    <div className="flex flex-col w-full h-max">
-                        <label className="w-fit" htmlFor="country">Country</label>
+                    <div className="flex flex-col w-full h-max relative">
+                        <label className="w-fit" htmlFor="country">Country <span className="text-red-700">*</span></label>
                         <Field id="country" type="text" name="country" className="text-gray-700 px-1 w-full border-2 border-white focus:border-black bg-white text-center rounded" />
+                        <ErrorMessage name="country" component="span" className="absolute -bottom-3.5 leading-none text-[smaller] w-full text-red-700 italic" />
                     </div>
                     <div className="mx-auto w-fit">
-                        <button type="submit" disabled={isSubmitting} id="create-btn" className="bg-[#fedf4b] px-2 mx-2 rounded hover:border-2 box-border h-8 w-16 cursor-pointer">Save</button>
+                        <button type="submit" disabled={isSubmitting} className="bg-[#fedf4b] px-2 mx-2 rounded hover:border-2 box-border h-8 w-16 cursor-pointer">Save</button>
                         <button type="button" onClick={() => { setIsForm ? setIsForm(false) : navigate(-1) }} className="bg-zinc-200 px-2 mx-2 rounded hover:border-2 box-border h-8 w-20 cursor-pointer">Cancel</button>
                     </div>
                 </Form>

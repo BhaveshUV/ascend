@@ -1,10 +1,12 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { ALL_LISTINGS_URL } from "../utils/constants";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { FlashContext } from "../contexts/FlashContextProvider";
+import { useContext } from "react";
 
-const ReviewForm = () => {
+const ReviewForm = ({ setRefreshListing }) => {
     const { id } = useParams();
-    const navigate = useNavigate();
+    const { setFlashMessage } = useContext(FlashContext);
 
     let createHandler = async (values) => {
         let { rating, review } = values;
@@ -18,16 +20,16 @@ const ReviewForm = () => {
                 body: JSON.stringify(form)
             });
             if (response.ok) {
-                navigate(0);
-                window.alert("Review added successfully")
+                setRefreshListing(prev => !prev);
+                setFlashMessage("success", "Review added successfully")
                 return;
             }
             let err = await response.json();
             console.dir(err);
-            window.alert(err.error);
+            setFlashMessage("error", err.error);
         } catch (e) {
             console.dir(e);
-            window.alert("Request failed: ", e);
+            setFlashMessage("error", "Request failed: " + e);
         }
     }
 
@@ -43,10 +45,11 @@ const ReviewForm = () => {
                     }
                     return errors;
                 }}
-                onSubmit={(values, { setSubmitting }) => {
+                onSubmit={(values, { setSubmitting, resetForm }) => {
                     alert("You've submitted: " + JSON.stringify(values, null, 2));
                     createHandler(values);
                     setSubmitting(false);
+                    resetForm();
                 }}
             >
                 {({ isSubmitting }) => (

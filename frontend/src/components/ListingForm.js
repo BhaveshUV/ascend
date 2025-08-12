@@ -1,13 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { ALL_LISTINGS_URL } from "../utils/constants";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { FlashContext } from "../contexts/FlashContextProvider";
+import { useContext } from "react";
 
-const ListingForm = ({ listing, setIsForm }) => {
-    if (!listing) {
-        listing = {};
+const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
+    let listing = {};
+    if (listingData) {
+        listing = listingData;
     }
 
     const navigate = useNavigate();
+    const { setFlashMessage } = useContext(FlashContext);
 
     let editHandler = async (values) => {
         let { title, description, image, price, location, country } = values;
@@ -21,15 +25,16 @@ const ListingForm = ({ listing, setIsForm }) => {
                 body: JSON.stringify(updatedForm)
             });
             if (response.ok) {
-                navigate(0);
-                window.alert("Update successful");
+                setRefreshListing(prev => !prev);
+                setIsForm(false);
+                setFlashMessage("success", "Update successful");
             } else {
                 const error = await response.json();
                 console.dir(error);
-                window.alert("Error updating the listing: " + error.error);
+                setFlashMessage("error", "Error updating the listing: " + error.error);
             }
         } catch (e) {
-            window.alert("Request failed: ", e);
+            setFlashMessage("error", "Request failed: ", e);
         }
     }
 
@@ -46,15 +51,15 @@ const ListingForm = ({ listing, setIsForm }) => {
             });
             if (response.ok) {
                 navigate(-1);
-                window.alert("Listing created successfully")
+                setFlashMessage("success", "Listing created successfully")
                 return;
             }
             let err = await response.json();
             console.dir(err);
-            window.alert(err.error);
+            setFlashMessage("error", err.error);
         } catch (e) {
             console.dir(e);
-            window.alert("Request failed: ", e);
+            setFlashMessage("error", "Request failed: " + e);
         }
     }
 
@@ -81,7 +86,7 @@ const ListingForm = ({ listing, setIsForm }) => {
                     errors.description = 'Required';
                 } if (listing._id && !values.image) {
                     errors.image = 'Required';
-                } if (!values.price && values.price!='0') {
+                } if (!values.price && values.price != '0') {
                     errors.price = 'Required';
                 } else if (values.price <= 0) {
                     errors.price = 'Enter a valid amount';

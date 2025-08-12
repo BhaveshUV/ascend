@@ -1,8 +1,10 @@
 import { ALL_LISTINGS_URL } from "../utils/constants";
-import { useNavigate } from "react-router-dom";
+import { FlashContext } from "../contexts/FlashContextProvider";
+import { useContext } from "react";
 
-const Reviews = ({ listing }) => {
-    const navigate = useNavigate();
+const Reviews = ({ listingData, setRefreshListing }) => {
+    let listing = listingData;
+    const { setFlashMessage } = useContext(FlashContext);
 
     const printStar = (rating) => {
         switch (rating) {
@@ -26,14 +28,14 @@ const Reviews = ({ listing }) => {
             console.dir(res);
             if(!res.ok) {
                 const err = await res.json();
-                window.alert(`Error deleting the review: ${err}`);
+                setFlashMessage("error", `Error deleting the review: ${err}`);
                 console.dir(err);
                 return;
             }
-            window.alert("Review deleted successfully");
-            navigate(0);
+            setFlashMessage("success", "Review deleted successfully");
+            setRefreshListing(prev => !prev);
         } catch (e) {
-            window.alert("Request failed: " + e);
+            setFlashMessage("error", "Request failed: " + e);
             console.dir(e);
         }
     }

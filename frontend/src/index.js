@@ -7,7 +7,7 @@ import AllListings from "./components/AllListings";
 import Error from "./components/Error";
 import Listing from "./components/Listing";
 import ListingForm from "./components/ListingForm";
-import listingLoader from "./loaders/listingLoader";
+import FlashContextProvider from "./contexts/FlashContextProvider";
 
 let appRouter = createBrowserRouter([
     {
@@ -26,11 +26,10 @@ let appRouter = createBrowserRouter([
             {
                 path: "/listings/:id",
                 element: <Listing />,
-                loader: listingLoader
             }
         ]
     }
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<RouterProvider router={appRouter} />);
+root.render(<FlashContextProvider><RouterProvider router={appRouter} /></FlashContextProvider>);

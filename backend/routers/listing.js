@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Listing = require("../models/listing");
 const Review = require("../models/review");
-const { listingSchema } = require("../schemaValidation.js");
+const { listingSchemaValidation } = require("../schemaValidation.js");
 
 router.get("/", async (req, res) => {
     try {
@@ -50,7 +50,7 @@ router.get("/:id", async (req, res) => {
 // });
 
 const validateListing = (req, res) => {
-    let validity = listingSchema.validate({ listing: req.body });
+    let validity = listingSchemaValidation.validate({ listing: req.body });
     console.dir(validity);
     if (validity.error) {
         let errMsg = validity.error.details.map((el) => el.message).join(", ");

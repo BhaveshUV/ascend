@@ -3,6 +3,16 @@ const router = express.Router({mergeParams: true});
 const mongoose = require("mongoose");
 const Listing = require("../models/listing");
 const Review = require("../models/review");
+const { reviewSchemaValidation } = require("../schemaValidation.js");
+
+const validateReview = (req, res) => {
+    let validity = reviewSchemaValidation.validate({ review: req.body });
+    console.dir(validity);
+    if (validity.error) {
+        let errMsg = validity.error.details.map((el) => el.message).join(", ");
+        return res.status(404).json({ error: errMsg });
+    }
+};
 
 router.post("/", async (req, res) => {
     try {
@@ -10,6 +20,7 @@ router.post("/", async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: "Listing not found!" });
         }
+        validateReview(req, res);
         const review = await Review.create(req.body);
         if (!review) return res.status(400).json({ error: "Review creation failed!" });
         const updatedListing = await Listing.findByIdAndUpdate(id, { $push: { reviews: review._id } }, { returnDocument: "after" });

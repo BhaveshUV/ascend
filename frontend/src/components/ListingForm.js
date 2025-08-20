@@ -104,7 +104,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
             }}
         >
             {({ isSubmitting }) => (
-                <Form className="flex flex-col mx-auto py-4 px-6 gap-6 w-full sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] relative">
+                <Form className="flex flex-col mx-auto py-4 px-6 gap-6 w-full sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] relative cursor-default">
                     <div onClick={() => { setIsForm ? setIsForm(false) : navigate(-1) }} className="absolute right-1 top-2 sm:right-6 h-6 w-6 border-3 rounded-full cursor-pointer flex flex-col justify-center items-center">
                         <span className="absolute rotate-45 border-b-3 w-[0.8rem]"></span>
                         <span className="absolute -rotate-45 border-b-3 w-[0.8rem]"></span>

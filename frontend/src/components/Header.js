@@ -15,16 +15,22 @@ const Header = () => {
                         <NavLink to={"/listings"} className={({ isActive }) => `border-transparent border-y-2 leading-12 box-border ${isActive ? "text-[#fedf4b] hover:border-b-[#fedf4b]" : "hover:border-b-white hover:text-white"}`} end>All Listings</NavLink>
                         <NavLink to={"/listings/new"} className={({ isActive }) => `border-transparent border-y-2 leading-12 box-border ${isActive ? "text-[#fedf4b] hover:border-b-[#fedf4b]" : "hover:border-b-white hover:text-white"}`} end>Add New Listing</NavLink>
                     </div>
-                    <div className="max-[736px]:flex min-[736px]:hidden flex-col gap-2 px-1 py-2 absolute right-2 cursor-pointer hover:text-white" onClick={() => { document.getElementById("optional-navbar").classList.toggle("max-h-0"); document.getElementById("optional-navbar").classList.toggle("max-h-52") }}>
+                    <div className="flex gap-2 grow justify-end max-[736px]:hidden">
+                        <NavLink to={"/login"} className={({ isActive }) => `text-nowrap border-transparent border-y-2 leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`}>Log in</NavLink>
+                        <NavLink to={"/signup"} className={({ isActive }) => `text-nowrap border-2 rounded leading-none self-center p-1 ${isActive ? "text-[#fedf4b] border-[#fedf4b]" : "border-zinc-200 hover:border-transparent hover:bg-[#fedf4b] hover:text-black"}`}>Sign up</NavLink>
+                    </div>
+                    <div className="max-[736px]:flex min-[736px]:hidden flex-col gap-2 px-1 py-2 absolute right-2 cursor-pointer hover:text-white" onClick={() => { document.getElementById("optional-navbar").classList.toggle("max-h-0"); document.getElementById("optional-navbar").classList.toggle("max-h-60") }}>
                         <span className="border-b-2 w-8"></span>
                         <span className="border-b-2 w-8"></span>
                         <span className="border-b-2 w-8"></span>
                     </div>
                 </div>
                 <div id="optional-navbar" className="min-[736px]:h-0 max-h-0 flex flex-col px-2 text-zinc-200 overflow-hidden transition-[max-height] duration-300 ease-in-out">
-                    <NavLink to={"/"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-52") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`} end>Home</NavLink>
-                    <NavLink to={"/listings"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-52") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`} end>All Listings</NavLink>
-                    <NavLink to={"/listings/new"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-52") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`} end>Add New Listing</NavLink>
+                    <NavLink to={"/"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`} end>Home</NavLink>
+                    <NavLink to={"/listings"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`} end>All Listings</NavLink>
+                    <NavLink to={"/listings/new"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`} end>Add New Listing</NavLink>
+                    <NavLink to={"/login"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`}>Log in</NavLink>
+                    <NavLink to={"/signup"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`}>Sign up</NavLink>
                 </div>
             </div>
             {flash && <div className={`${flash.type === 'success' ? 'bg-green-300 py-2' : ''} ${flash.type === 'error' ? 'bg-red-300 py-2' : ''} text-center absolute w-full box-border min-h-8`}>{flash.message}</div>}

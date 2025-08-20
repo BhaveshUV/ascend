@@ -8,6 +8,8 @@ import Error from "./components/Error";
 import Listing from "./components/Listing";
 import ListingForm from "./components/ListingForm";
 import FlashContextProvider from "./contexts/FlashContextProvider";
+import LoginForm from "./components/LoginForm";
+import SignupForm from "./components/SignupForm";
 
 let appRouter = createBrowserRouter([
     {
@@ -15,6 +17,14 @@ let appRouter = createBrowserRouter([
         element: <App />,
         errorElement: <Error />,
         children: [
+            {
+                path: "/login",
+                element: <LoginForm />,
+            },
+            {
+                path: "/signup",
+                element: <SignupForm />,
+            },
             {
                 path: "/listings",
                 element: <AllListings />

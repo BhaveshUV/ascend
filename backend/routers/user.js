@@ -10,8 +10,19 @@ router.get("/me", async (req, res) => {
         res.json({ user: { _id: req.user.id, username: req.user.username, email: req.user.email } });
     } catch (e) {
         console.dir(e);
-        res.status(500).json({error: `Error connecting the server`, user: null});
+        res.status(500).json({ error: `Error connecting the server`, user: null });
     }
+});
+
+router.get("/logout", (req, res, next) => {
+    req.logout((err) => {
+        if (err) return next(err);
+
+        req.session.destroy(() => {
+            res.clearCookie("connect.sid");
+            res.status(200).json({ message: "Log out successful" });
+        });
+    });
 });
 
 router.post("/signup", validateUser, async (req, res) => {

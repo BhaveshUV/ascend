@@ -3,10 +3,29 @@ import { NavLink } from "react-router-dom";
 import { useContext } from "react";
 import { FlashContext } from "../contexts/FlashContextProvider";
 import { AuthContext } from "../contexts/AuthContextProvider";
+import { LOGOUT_URL } from "../utils/constants";
 
 const Header = () => {
-    const { flash } = useContext(FlashContext);
-    const { currUser, loading } = useContext(AuthContext);
+    const { flash, setFlashMessage } = useContext(FlashContext);
+    const { currUser, setCurrUser, loading } = useContext(AuthContext);
+
+    const logoutHandler = async () => {
+        try {
+            const response = await fetch(LOGOUT_URL, {
+                credentials: "include"
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setFlashMessage("success", data.message);
+                setCurrUser(null);
+                return;
+            }
+            setFlashMessage("error", data.error);
+        } catch (e) {
+            setFlashMessage("error", `Request failed: ${e}`);
+        }
+    }
+
     return (
         <div className="sticky top-0 z-10">
             <div className="bg-zinc-800 px-2 text-zinc-200 select-none">
@@ -22,7 +41,7 @@ const Header = () => {
                             <NavLink to={"/login"} className={({ isActive }) => `text-nowrap border-transparent border-y-2 leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`}>Log in</NavLink>
                             <NavLink to={"/signup"} className={({ isActive }) => `text-nowrap border-2 rounded leading-none self-center p-1 ${isActive ? "text-[#fedf4b] border-[#fedf4b]" : "border-zinc-200 hover:border-transparent hover:bg-[#fedf4b] hover:text-black"}`}>Sign up</NavLink>
                         </>}
-                        {!loading && currUser && <NavLink to={"/logout"} className={({ isActive }) => `text-nowrap border-transparent border-y-2 leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`}>Log out</NavLink>}
+                        {!loading && currUser && <span onClick={() => logoutHandler()} className="text-nowrap border-transparent border-y-2 leading-12 hover:text-white cursor-pointer">Log out</span>}
                     </div>
                     <div className="max-[736px]:flex min-[736px]:hidden flex-col gap-2 px-1 py-2 absolute right-2 cursor-pointer hover:text-white" onClick={() => { document.getElementById("optional-navbar").classList.toggle("max-h-0"); document.getElementById("optional-navbar").classList.toggle("max-h-60") }}>
                         <span className="border-b-2 w-8"></span>
@@ -38,7 +57,7 @@ const Header = () => {
                         <NavLink to={"/login"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`}>Log in</NavLink>
                         <NavLink to={"/signup"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`}>Sign up</NavLink>
                     </>}
-                    {!loading && currUser && <NavLink to={"/logout"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`}>Log out</NavLink>}
+                    {!loading && currUser && <span onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60"); logoutHandler() }} className="leading-12 hover:text-white cursor-pointer">Log out</span>}
                 </div>
             </div>
             {flash && <div className={`${flash.type === 'success' ? 'bg-green-300 p-2' : ''} ${flash.type === 'error' ? 'bg-red-300 p-2' : ''} text-center absolute w-full box-border min-h-8`}>{flash.message}</div>}

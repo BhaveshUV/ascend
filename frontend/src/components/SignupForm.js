@@ -1,14 +1,15 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { validateEmail, validatePassword } from "../utils/validate";
 import { SIGNUP_URL } from '../utils/constants';
-import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { FlashContext } from '../contexts/FlashContextProvider';
+import { AuthContext } from '../contexts/AuthContextProvider';
 
 const SignupForm = () => {
     const navigate = useNavigate();
     const { setFlashMessage } = useContext(FlashContext);
+    const { currUser, setCurrUser } = useContext(AuthContext);
 
     const signupHandler = async (values) => {
         try {
@@ -23,13 +24,16 @@ const SignupForm = () => {
             const data = await response.json();
             if (response.ok) {
                 console.dir(data.user);
-                setFlashMessage('success', data.message);
+                setFlashMessage('success', data.message + "! Welcome to Ascend");
+                setCurrUser(data.user);
                 navigate(-1);
                 return;
             }
             setFlashMessage('error', data.error || 'Sign up failed');
+            if(currUser) setCurrUser(null);
         } catch (e) {
-            setFlashMessage('error', e.message || 'Request failed');
+            setFlashMessage('error', 'Request failed:' + e.message);
+            if(currUser) setCurrUser(null);
         }
     }
 

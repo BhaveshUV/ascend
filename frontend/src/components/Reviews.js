@@ -1,11 +1,13 @@
 import { ALL_LISTINGS_URL } from "../utils/constants";
 import { FlashContext } from "../contexts/FlashContextProvider";
+import { AuthContext } from "../contexts/AuthContextProvider";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Reviews = ({ listingData, setRefreshListing }) => {
     let listing = listingData;
     const { setFlashMessage } = useContext(FlashContext);
+    const { currUser, loading } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const printStar = (rating) => {
@@ -56,7 +58,7 @@ const Reviews = ({ listingData, setRefreshListing }) => {
                                 <div className="text-gray-900 font-semibold">{ele.by}</div>
                                 <div>{printStar(ele.rating)}</div>
                                 <div className="text-gray-700">{ele.review}</div>
-                                <button onClick={() => window.prompt("To confirm the deletion — type anything and press OK.\nTo cancel — press Cancel button") ? deleteHandler(ele._id) : ""} className="mt-2 rounded px-2 border-2 border-black bg-zinc-200 hover:bg-black hover:text-white cursor-pointer">Delete</button>
+                                {!loading && currUser && <button onClick={() => window.prompt("To confirm the deletion — type anything and press OK.\nTo cancel — press Cancel button") ? deleteHandler(ele._id) : ""} className="mt-2 rounded px-2 border-2 border-black bg-zinc-200 hover:bg-black hover:text-white cursor-pointer">Delete</button>}
                             </div>
                         ))
                 }

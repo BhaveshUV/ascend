@@ -1,13 +1,14 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ALL_LISTINGS_URL } from "../utils/constants";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { FlashContext } from "../contexts/FlashContextProvider";
+import { AuthContext } from "../contexts/AuthContextProvider";
 import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
 
 const ReviewForm = ({ setRefreshListing }) => {
     const { id } = useParams();
     const { setFlashMessage } = useContext(FlashContext);
+    const { currUser, loading } = useContext(AuthContext);
     const navigate = useNavigate();
 
     let createHandler = async (values) => {
@@ -50,6 +51,12 @@ const ReviewForm = ({ setRefreshListing }) => {
                     return errors;
                 }}
                 onSubmit={(values, { setSubmitting, resetForm }) => {
+                    if(!loading && !currUser) {
+                        setFlashMessage("error", "You are not logged in");
+                        setSubmitting(false);
+                        navigate("/login");
+                        return;
+                    }
                     alert("You've submitted: " + JSON.stringify(values, null, 2));
                     createHandler(values);
                     setSubmitting(false);

@@ -1,13 +1,14 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { validateEmail, validatePassword } from '../utils/validate';
-import { Link } from 'react-router-dom';
+import { validatePassword } from '../utils/validate';
+import { Link, useNavigate } from 'react-router-dom';
 import { LOGIN_URL } from '../utils/constants';
 import { useContext } from 'react';
 import { FlashContext } from '../contexts/FlashContextProvider';
-import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContextProvider';
 
 const LoginForm = () => {
     const { setFlashMessage } = useContext(FlashContext);
+    const { currUser, setCurrUser } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const loginHandler = async (values) => {
@@ -21,15 +22,19 @@ const LoginForm = () => {
                 body: JSON.stringify(values)
             });
             const data = await response.json();
-            if(!response.ok) {
+            if (!response.ok) {
                 console.dir(data);
                 setFlashMessage("error", `${data.error}: ${data.info.name}` || "Log in failed");
+                if(currUser) setCurrUser(null);
                 return;
             }
-            setFlashMessage("success", data.message || "Logged in successfully");
+            setFlashMessage("success", (data.message || "Logged in successfully") + "! Welcome to Ascend");
+            setCurrUser(data.user);
             navigate(-1);
         } catch (e) {
-            setFlashMessage("error", e);
+            console.dir(e);
+            setFlashMessage("error", "Request failed: " + e);
+            if(currUser) setCurrUser(null);
         }
     }
 

@@ -23,7 +23,7 @@ const AllListings = () => {
 
     return !listings ? <div>Fetching listings...</div> : isForm ? <ListingForm listing={{}} setIsForm={setIsForm} /> : (
         <>
-            <div className="flex flex-wrap gap-4 items-end my-8 px-4">
+            <div className="flex flex-wrap gap-4 items-end my-8 px-4 cursor-default">
                 <span className="text-3xl font-bold">All Listings</span>
             </div>
             <div className="flex flex-wrap justify-center gap-8 px-4 pb-8">

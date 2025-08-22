@@ -14,17 +14,19 @@ const SignupForm = () => {
         try {
             const response = await fetch(SIGNUP_URL, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(values)
             });
+            const data = await response.json();
             if (response.ok) {
-                setFlashMessage('success', 'Sign up successful');
-                navigate('/listings');
+                console.dir(data.user);
+                setFlashMessage('success', data.message);
+                navigate(-1);
                 return;
             }
-            const data = await response.json();
             setFlashMessage('error', data.error || 'Sign up failed');
         } catch (e) {
             setFlashMessage('error', e.message || 'Request failed');
@@ -51,7 +53,6 @@ const SignupForm = () => {
             }}
             onSubmit={(values, { setSubmitting, resetForm }) => {
                 setTimeout(() => {
-                    alert(JSON.stringify(values, null, 2));
                     signupHandler(values);
                     setSubmitting(false);
                     resetForm();
@@ -62,7 +63,7 @@ const SignupForm = () => {
                 <Form className="flex flex-col mx-auto py-4 px-6 gap-7 w-full sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] relative">
                     <div className="flex flex-col items-center cursor-default">
                         <span className="font-bold text-xl text-center">Sign up Form</span>
-                        <span className="font-semibold">Already a user? <Link to="/login" className='underline'>Click to Log in</Link></span>
+                        <span className="font-medium flex flex-wrap justify-center gap-1 leading-none"><span>Already a user?</span><Link to="/login" className='underline'>Click to Log in</Link></span>
                     </div>
                     <div className="flex flex-col w-full relative">
                         <label className="w-fit" htmlFor="username">Username <span className="text-red-700">*</span></label>

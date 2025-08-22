@@ -27,7 +27,8 @@ const app = express();
 
 //---------------- Enable CORS for all incoming requests ----------------//
 app.use(cors({
-    origin: "http://localhost:1234" // Parcel development phase
+    origin: "http://localhost:1234", // Parcel development phase
+    credentials: true // This includes 'Access-Control-Allow-Credentials' in CORS response which requests the browser to store the cookie
 }));
 
 //------------ Enable middlewares for all incoming requests ------------//
@@ -40,7 +41,12 @@ app.use(cookieParser(process.env.SESSION_SECRET));
 const sessionOptions = {
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: false, // true would create empty sessions for every new visitor, even before log in —> confusion
+    cookie: {
+        httpOnly: true,
+        secure: false, // Set to true if using HTTPS i.e. on production
+        sameSite: "lax" // Set to "none" on production
+    }
 };
 
 app.use(session(sessionOptions));

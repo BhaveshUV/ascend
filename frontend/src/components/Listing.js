@@ -1,5 +1,5 @@
-import { Suspense, useState, useEffect, useContext } from "react";
-import { Await, useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import ListingForm from "./ListingForm";
 import ReviewForm from "./ReviewForm";
 import Reviews from "./Reviews";
@@ -29,6 +29,7 @@ const Listing = () => {
             }
             let err = await response.json();
             console.log(err);
+            if(err.error === "You are not logged in") navigate("/login");
             setFlashMessage("error", err.error || "Error deleting the listing");
         } catch (e) {
             setFlashMessage("error", "Request failed: " + e);
@@ -42,6 +43,7 @@ const Listing = () => {
                 const err = await res.json();
                 console.dir(err);
                 setFlashMessage("error", err.error || "Listing not found");
+                return;
             }
             const data = await res.json();
             setListing(data);

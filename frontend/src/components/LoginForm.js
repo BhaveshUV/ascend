@@ -1,18 +1,44 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { validateEmail, validatePassword } from '../utils/validate';
 import { Link } from 'react-router-dom';
+import { LOGIN_URL } from '../utils/constants';
+import { useContext } from 'react';
+import { FlashContext } from '../contexts/FlashContextProvider';
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
+    const { setFlashMessage } = useContext(FlashContext);
+    const navigate = useNavigate();
+
+    const loginHandler = async (values) => {
+        try {
+            const response = await fetch(LOGIN_URL, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(values)
+            });
+            const data = await response.json();
+            if(!response.ok) {
+                console.dir(data);
+                setFlashMessage("error", `${data.error}: ${data.info.name}` || "Log in failed");
+                return;
+            }
+            setFlashMessage("success", data.message || "Logged in successfully");
+            navigate(-1);
+        } catch (e) {
+            setFlashMessage("error", e);
+        }
+    }
+
     return (
         <Formik
             initialValues={{ email: '', username: '', password: '' }}
             validate={values => {
                 const errors = {};
-                if (!values.email) {
-                    errors.email = 'Required';
-                } else if (!validateEmail(values.email)) {
-                    errors.email = 'Invalid email address';
-                } if (!values.username) {
+                if (!values.username) {
                     errors.username = 'Required';
                 } if (!values.password) {
                     errors.password = 'Required';
@@ -21,10 +47,11 @@ const LoginForm = () => {
                 }
                 return errors;
             }}
-            onSubmit={(values, { setSubmitting }) => {
+            onSubmit={(values, { setSubmitting, resetForm }) => {
                 setTimeout(() => {
-                    alert(JSON.stringify(values, null, 2));
+                    loginHandler(values);
                     setSubmitting(false);
+                    resetForm();
                 });
             }}
         >
@@ -32,7 +59,7 @@ const LoginForm = () => {
                 <Form className="flex flex-col mx-auto py-4 px-6 gap-7 w-full sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] relative">
                     <div className="flex flex-col items-center cursor-default">
                         <span className="font-bold text-xl text-center">Log in Form</span>
-                        <span className="font-semibold">New to website? <Link to="/signup" className='underline'>Click to Sign up</Link></span>
+                        <span className="font-medium flex flex-wrap justify-center gap-1 leading-none"><span>New to website?</span><Link to="/signup" className='underline'>Click to Sign up</Link></span>
                     </div>
                     <div className="flex flex-col w-full relative">
                         <label className="w-fit" htmlFor="username">Username <span className="text-red-700">*</span></label>

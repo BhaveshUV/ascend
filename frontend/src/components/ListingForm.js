@@ -19,6 +19,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
         try {
             const response = await fetch(`${ALL_LISTINGS_URL}/${listing._id}`, {
                 method: "PATCH",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -31,6 +32,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
             } else {
                 const error = await response.json();
                 console.dir(error);
+                if(error.error === "You are not logged in") navigate("/login"); 
                 setFlashMessage("error", "Error updating the listing: " + error.error);
             }
         } catch (e) {
@@ -44,6 +46,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
         try {
             const response = await fetch(ALL_LISTINGS_URL, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -56,6 +59,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
             }
             let err = await response.json();
             console.dir(err);
+            if(err.error === "You are not logged in") navigate("/login");
             setFlashMessage("error", err.error);
         } catch (e) {
             console.dir(e);
@@ -140,7 +144,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
                     </div>
                     <div className="flex flex-col w-full h-max relative">
                         <label className="w-fit" htmlFor="country">Country <span className="text-red-700">*</span></label>
-                        <Field id="country" type="text" name="country" className="text-gray-700 px-1 w-full border-2 border-white focus:border-black bg-white text-center rounded" />
+                        <Field id="country" type="text" name="country" autoComplete="country-name" className="text-gray-700 px-1 w-full border-2 border-white focus:border-black bg-white text-center rounded" />
                         <ErrorMessage name="country" component="span" className="absolute -bottom-3.5 leading-none text-[smaller] w-full text-red-700 italic" />
                     </div>
                     <div className="mx-auto w-fit">

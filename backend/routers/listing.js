@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Listing = require("../models/listing");
 const Review = require("../models/review");
-const { listingSchemaValidation } = require("../schemaValidation.js");
+const { validateListing, isUserLoggedIn } = require("../middlewares");
 
 router.get("/", async (req, res) => {
     try {
@@ -49,22 +49,12 @@ router.get("/:id", async (req, res) => {
 //         .catch(e => res.send(e));
 // });
 
-const validateListing = (req, res) => {
-    let validity = listingSchemaValidation.validate({ listing: req.body });
-    console.dir(validity);
-    if (validity.error) {
-        let errMsg = validity.error.details.map((el) => el.message).join(", ");
-        return res.status(404).json({ error: errMsg });
-    }
-};
-
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", isUserLoggedIn, validateListing, async (req, res) => {
     try {
         const { id } = req.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: "Invalid ID format" });
         }
-        validateListing(req, res);
         let result = await Listing.findOneAndUpdate({ _id: id }, req.body, { returnDocument: "after", runValidators: true });
         if (!result) {
             return res.status(404).json({ error: "Listing not found!" });
@@ -76,9 +66,8 @@ router.patch("/:id", async (req, res) => {
     }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", isUserLoggedIn, validateListing, async (req, res) => {
     try {
-        validateListing(req, res);
         console.log("Received request.body: ", req.body);
         const createdListing = await Listing.create(req.body);
         if (!createdListing) return res.status(400).json({ error: "Listing creation failed!" });
@@ -89,7 +78,7 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", isUserLoggedIn, async (req, res) => {
     try {
         let { id } = req.params;
         let deletedListing = await Listing.findOneAndDelete({ _id: id });

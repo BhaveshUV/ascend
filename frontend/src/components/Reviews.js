@@ -1,10 +1,12 @@
 import { ALL_LISTINGS_URL } from "../utils/constants";
 import { FlashContext } from "../contexts/FlashContextProvider";
 import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Reviews = ({ listingData, setRefreshListing }) => {
     let listing = listingData;
     const { setFlashMessage } = useContext(FlashContext);
+    const navigate = useNavigate();
 
     const printStar = (rating) => {
         switch (rating) {
@@ -21,6 +23,7 @@ const Reviews = ({ listingData, setRefreshListing }) => {
         try {
             const res = await fetch(`${ALL_LISTINGS_URL}/${listing._id}/reviews/${reviewId}`, {
                 method: "DELETE",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json"
                 }
@@ -28,7 +31,8 @@ const Reviews = ({ listingData, setRefreshListing }) => {
             console.dir(res);
             if(!res.ok) {
                 const err = await res.json();
-                setFlashMessage("error", `Error deleting the review: ${err}`);
+                if(err.error === "You are not logged in") navigate("/login");
+                setFlashMessage("error", `Error deleting the review: ${err.error}`);
                 console.dir(err);
                 return;
             }

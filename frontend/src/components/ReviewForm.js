@@ -3,10 +3,12 @@ import { ALL_LISTINGS_URL } from "../utils/constants";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { FlashContext } from "../contexts/FlashContextProvider";
 import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ReviewForm = ({ setRefreshListing }) => {
     const { id } = useParams();
     const { setFlashMessage } = useContext(FlashContext);
+    const navigate = useNavigate();
 
     let createHandler = async (values) => {
         let { rating, review } = values;
@@ -14,6 +16,7 @@ const ReviewForm = ({ setRefreshListing }) => {
         try {
             const response = await fetch(ALL_LISTINGS_URL + `/${id}/reviews`, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -26,6 +29,7 @@ const ReviewForm = ({ setRefreshListing }) => {
             }
             let err = await response.json();
             console.dir(err);
+            if(err.error === "You are not logged in") navigate("/login");
             setFlashMessage("error", err.error);
         } catch (e) {
             console.dir(e);

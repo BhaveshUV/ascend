@@ -1,1 +1,5 @@
 export const ALL_LISTINGS_URL = "http://localhost:8080/api/listings";
+export const SIGNUP_URL = "http://localhost:8080/api/users/signup";
+export const LOGIN_URL = "http://localhost:8080/api/users/login";
+export const LOGGED_IN_USER_URL = "http://localhost:8080/api/users/me";
+export const LOGOUT_URL = "http://localhost:8080/api/users/logout";

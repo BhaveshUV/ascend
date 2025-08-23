@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { ALL_LISTINGS_URL } from "../utils/constants";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { FlashContext } from "../contexts/FlashContextProvider";
+import { AuthContext } from "../contexts/AuthContextProvider";
 import { useContext } from "react";
 
 const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
@@ -12,6 +13,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
 
     const navigate = useNavigate();
     const { setFlashMessage } = useContext(FlashContext);
+    const { currUser } = useContext(AuthContext);
 
     let editHandler = async (values) => {
         let { title, description, image, price, location, country } = values;
@@ -19,6 +21,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
         try {
             const response = await fetch(`${ALL_LISTINGS_URL}/${listing._id}`, {
                 method: "PATCH",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -31,7 +34,8 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
             } else {
                 const error = await response.json();
                 console.dir(error);
-                setFlashMessage("error", "Error updating the listing: " + error.error);
+                if (error.error === "You are not logged in") navigate("/login");
+                setFlashMessage("error", error.error);
             }
         } catch (e) {
             setFlashMessage("error", "Request failed: ", e);
@@ -40,10 +44,11 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
 
     let createHandler = async (values) => {
         let { title, description, image, price, location, country } = values;
-        let form = { title, description, image, price, location, country, by: "Default-user" };
+        let form = { title, description, image, price, location, country };
         try {
             const response = await fetch(ALL_LISTINGS_URL, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -56,6 +61,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
             }
             let err = await response.json();
             console.dir(err);
+            if (err.error === "You are not logged in") navigate("/login");
             setFlashMessage("error", err.error);
         } catch (e) {
             console.dir(e);
@@ -104,13 +110,13 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
             }}
         >
             {({ isSubmitting }) => (
-                <Form className="flex flex-col mx-auto py-4 px-6 gap-6 w-full sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] relative">
+                <Form className="flex flex-col mx-auto py-4 px-6 gap-6 w-full sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] relative cursor-default">
                     <div onClick={() => { setIsForm ? setIsForm(false) : navigate(-1) }} className="absolute right-1 top-2 sm:right-6 h-6 w-6 border-3 rounded-full cursor-pointer flex flex-col justify-center items-center">
                         <span className="absolute rotate-45 border-b-3 w-[0.8rem]"></span>
                         <span className="absolute -rotate-45 border-b-3 w-[0.8rem]"></span>
                     </div>
                     <div className="flex flex-col items-center">
-                        <span className="font-bold text-xl text-center">{listing.by || "Default User"}</span>
+                        <span className="font-bold text-xl text-center">{listing._id ? listing.by.username : currUser.username}</span>
                         <span className="font-semibold">{listing._id ? "Edit your Listing" : "Create your Listing"}</span>
                     </div>
                     <div className="flex flex-col w-full relative">
@@ -140,7 +146,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
                     </div>
                     <div className="flex flex-col w-full h-max relative">
                         <label className="w-fit" htmlFor="country">Country <span className="text-red-700">*</span></label>
-                        <Field id="country" type="text" name="country" className="text-gray-700 px-1 w-full border-2 border-white focus:border-black bg-white text-center rounded" />
+                        <Field id="country" type="text" name="country" autoComplete="country-name" className="text-gray-700 px-1 w-full border-2 border-white focus:border-black bg-white text-center rounded" />
                         <ErrorMessage name="country" component="span" className="absolute -bottom-3.5 leading-none text-[smaller] w-full text-red-700 italic" />
                     </div>
                     <div className="mx-auto w-fit">

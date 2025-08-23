@@ -1,19 +1,23 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ALL_LISTINGS_URL } from "../utils/constants";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { FlashContext } from "../contexts/FlashContextProvider";
+import { AuthContext } from "../contexts/AuthContextProvider";
 import { useContext } from "react";
 
 const ReviewForm = ({ setRefreshListing }) => {
     const { id } = useParams();
     const { setFlashMessage } = useContext(FlashContext);
+    const { currUser, loading } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     let createHandler = async (values) => {
         let { rating, review } = values;
-        let form = { rating, review, by: "Default-user" };
+        let form = { rating, review, by: currUser._id };
         try {
             const response = await fetch(ALL_LISTINGS_URL + `/${id}/reviews`, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -26,6 +30,7 @@ const ReviewForm = ({ setRefreshListing }) => {
             }
             let err = await response.json();
             console.dir(err);
+            if(err.error === "You are not logged in") navigate("/login");
             setFlashMessage("error", err.error);
         } catch (e) {
             console.dir(e);
@@ -46,6 +51,12 @@ const ReviewForm = ({ setRefreshListing }) => {
                     return errors;
                 }}
                 onSubmit={(values, { setSubmitting, resetForm }) => {
+                    if(!loading && !currUser) {
+                        setFlashMessage("error", "You are not logged in");
+                        setSubmitting(false);
+                        navigate("/login");
+                        return;
+                    }
                     alert("You've submitted: " + JSON.stringify(values, null, 2));
                     createHandler(values);
                     setSubmitting(false);

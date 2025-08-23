@@ -16,7 +16,8 @@ const AuthContextProvider = ({ children }) => {
                     credentials: "include"
                 });
                 const data = await response.json();
-                if(!data.user) setFlashMessage("error", "Log in to create, edit and delete")
+                if (!data.user) setFlashMessage("error", "Log in to create, edit and delete")
+                console.dir(data.user);
                 setCurrUser(data.user);
                 setLoading(false);
             } catch (e) {

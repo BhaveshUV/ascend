@@ -3,11 +3,11 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Listing = require("../models/listing");
 const Review = require("../models/review");
-const { validateListing, isUserLoggedIn } = require("../middlewares");
+const { validateListing, isUserLoggedIn, isUserListingOwner } = require("../middlewares");
 
 router.get("/", async (req, res) => {
     try {
-        const allListings = await Listing.find({});
+        const allListings = await Listing.find({}).populate({path: "by", select: "username"});
         res.json(allListings);
     } catch (e) {
         console.error(`Error fetching all the listings: ${e.message}`);
@@ -21,7 +21,7 @@ router.get("/:id", async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: "Invalid ID format" });
         }
-        const listing = await Listing.findById(id).populate("reviews");
+        const listing = await Listing.findById(id).populate({path: "reviews", populate: {path: "by", select: "username"}}).populate({path: "by", select: "username"});
         if (!listing) {
             return res.status(404).json({ error: "Listing not found!" });
         }
@@ -49,7 +49,7 @@ router.get("/:id", async (req, res) => {
 //         .catch(e => res.send(e));
 // });
 
-router.patch("/:id", isUserLoggedIn, validateListing, async (req, res) => {
+router.patch("/:id", isUserLoggedIn, isUserListingOwner, validateListing, async (req, res) => {
     try {
         const { id } = req.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -78,7 +78,7 @@ router.post("/", isUserLoggedIn, validateListing, async (req, res) => {
     }
 });
 
-router.delete("/:id", isUserLoggedIn, async (req, res) => {
+router.delete("/:id", isUserLoggedIn, isUserListingOwner, async (req, res) => {
     try {
         let { id } = req.params;
         let deletedListing = await Listing.findOneAndDelete({ _id: id });

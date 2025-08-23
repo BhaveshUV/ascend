@@ -13,7 +13,7 @@ const ReviewForm = ({ setRefreshListing }) => {
 
     let createHandler = async (values) => {
         let { rating, review } = values;
-        let form = { rating, review, by: "Default-user" };
+        let form = { rating, review, by: currUser._id };
         try {
             const response = await fetch(ALL_LISTINGS_URL + `/${id}/reviews`, {
                 method: "POST",

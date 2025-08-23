@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Listing = require("../models/listing");
+const User = require("../models/user");
 const sampleListings = require("./data");
 
 //---------------- Set up MongoDB database connection ----------------//
@@ -11,15 +12,32 @@ main()
     .then(() => console.log("Connected to MongoDB server using Mongoose"))
     .catch(err => console.log(err));
 
-// Initializing the database with sample listings
-const initDB = () => {
-    Listing.deleteMany({})
-        .then(res => console.log("Deleted already existing data from DB", res))
-        .catch(e => console.log("Error while deleting already existing data from the DB: ", e));
+// Initializing the database with users & their listings
+const initDB = async () => {
+    try {
+        let res = await Listing.deleteMany({})
+        console.log("Deleted already existing data from DB", res);
 
-    Listing.insertMany(sampleListings)
-        .then(res => console.log("Initialized DB with sample listings successfully:\n", res))
-        .catch(e => console.log(e));
+        for (let listing of sampleListings) {
+            const newUser = {
+                username: listing.by,
+                email: listing.by.toLowerCase().replace(/\s/g, "") + "@gmail.com",
+            };
+
+            try {
+                const registeredUser = await User.register(newUser, "Password@12345");
+                await Listing.create({ ...listing, by: registeredUser._id });
+            } catch (e) {
+                console.error("Error registering the user or creating their listing", e);
+            }
+        }
+        console.log("Registered all users and created their listings");
+    } catch (e) {
+        console.log("Error in initDB: ", e);
+    } finally {
+        await mongoose.connection.close();
+        console.log("Closed the DB connection");
+    }
 }
 
 initDB();

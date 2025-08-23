@@ -33,7 +33,8 @@ let listingSchema = new mongoose.Schema({
         }
     ],
     by: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true
     }
 });
@@ -47,7 +48,7 @@ listingSchema.post("findOneAndDelete", async (deletedListing, next) => {
         console.log(`Post Listing.findOneAndDelete() middleware called, and the listing is deleted`);
     }
     next();
-})
+});
 
 const Listing = mongoose.model("Listing", listingSchema);
 

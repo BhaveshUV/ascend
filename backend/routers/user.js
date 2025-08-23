@@ -7,7 +7,7 @@ const { validateUser } = require("../middlewares.js");
 router.get("/me", async (req, res) => {
     try {
         if (!req.isAuthenticated()) return res.json({ user: null });
-        res.json({ user: { _id: req.user.id, username: req.user.username, email: req.user.email } });
+        res.json({ user: { _id: req.user._id, username: req.user.username, email: req.user.email } });
     } catch (e) {
         console.dir(e);
         res.status(500).json({ error: `Error connecting the server`, user: null });

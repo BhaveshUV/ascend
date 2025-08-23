@@ -31,10 +31,10 @@ const Reviews = ({ listingData, setRefreshListing }) => {
                 }
             });
             console.dir(res);
-            if(!res.ok) {
+            if (!res.ok) {
                 const err = await res.json();
-                if(err.error === "You are not logged in") navigate("/login");
-                setFlashMessage("error", `Error deleting the review: ${err.error}`);
+                if (err.error === "You are not logged in") navigate("/login");
+                setFlashMessage("error", err.error);
                 console.dir(err);
                 return;
             }
@@ -55,7 +55,7 @@ const Reviews = ({ listingData, setRefreshListing }) => {
                     !listing.reviews.length ? <div className="text-zinc-500 text-center">No reviews yet</div> :
                         listing.reviews.map(ele => (
                             <div key={ele._id} className="bg-zinc-200 px-2 py-2 rounded">
-                                <div className="text-gray-900 font-semibold">{ele.by}</div>
+                                <div className="text-gray-900 font-semibold">{ele.by.username}</div>
                                 <div>{printStar(ele.rating)}</div>
                                 <div className="text-gray-700">{ele.review}</div>
                                 {!loading && currUser && <button onClick={() => window.prompt("To confirm the deletion — type anything and press OK.\nTo cancel — press Cancel button") ? deleteHandler(ele._id) : ""} className="mt-2 rounded px-2 border-2 border-black bg-zinc-200 hover:bg-black hover:text-white cursor-pointer">Delete</button>}

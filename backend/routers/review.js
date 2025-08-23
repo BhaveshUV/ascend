@@ -3,7 +3,7 @@ const router = express.Router({mergeParams: true});
 const mongoose = require("mongoose");
 const Listing = require("../models/listing");
 const Review = require("../models/review");
-const { validateReview, isUserLoggedIn } = require("../middlewares");
+const { validateReview, isUserLoggedIn, isUserReviewOwner } = require("../middlewares");
 
 router.post("/", isUserLoggedIn, validateReview, async (req, res) => {
     try {
@@ -22,7 +22,7 @@ router.post("/", isUserLoggedIn, validateReview, async (req, res) => {
     }
 })
 
-router.delete("/:reviewId", isUserLoggedIn, async (req, res) => {
+router.delete("/:reviewId", isUserLoggedIn, isUserReviewOwner, async (req, res) => {
     try {
         const { id, reviewId } = req.params;
         const deletedReview = await Review.findByIdAndDelete(reviewId);

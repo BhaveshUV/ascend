@@ -13,8 +13,8 @@ const ListingCard = ({ listing }) => {
                     <p className="text-gray-700">Location: {location}</p>
                     <p className="text-gray-700">Country: {country}</p>
                 </div>
-                <p className="text-gray-700 font-semibold opacity-0 px-6">{by}</p>
-                <p className="text-gray-700 font-semibold absolute bottom-4 left-6">{by}</p>
+                <p className="text-gray-700 font-semibold opacity-0 px-6">{by.username}</p>
+                <p className="text-gray-700 font-semibold absolute bottom-4 left-6">{by.username}</p>
                 <div className="w-full h-full absolute top-0 hover:bg-white opacity-15"></div>
             </div>
         </Link>

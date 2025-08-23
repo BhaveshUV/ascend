@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { ALL_LISTINGS_URL } from "../utils/constants";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { FlashContext } from "../contexts/FlashContextProvider";
+import { AuthContext } from "../contexts/AuthContextProvider";
 import { useContext } from "react";
 
 const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
@@ -12,6 +13,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
 
     const navigate = useNavigate();
     const { setFlashMessage } = useContext(FlashContext);
+    const { currUser } = useContext(AuthContext);
 
     let editHandler = async (values) => {
         let { title, description, image, price, location, country } = values;
@@ -32,8 +34,8 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
             } else {
                 const error = await response.json();
                 console.dir(error);
-                if(error.error === "You are not logged in") navigate("/login"); 
-                setFlashMessage("error", "Error updating the listing: " + error.error);
+                if (error.error === "You are not logged in") navigate("/login");
+                setFlashMessage("error", error.error);
             }
         } catch (e) {
             setFlashMessage("error", "Request failed: ", e);
@@ -42,7 +44,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
 
     let createHandler = async (values) => {
         let { title, description, image, price, location, country } = values;
-        let form = { title, description, image, price, location, country, by: "Default-user" };
+        let form = { title, description, image, price, location, country };
         try {
             const response = await fetch(ALL_LISTINGS_URL, {
                 method: "POST",
@@ -59,7 +61,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
             }
             let err = await response.json();
             console.dir(err);
-            if(err.error === "You are not logged in") navigate("/login");
+            if (err.error === "You are not logged in") navigate("/login");
             setFlashMessage("error", err.error);
         } catch (e) {
             console.dir(e);
@@ -114,7 +116,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
                         <span className="absolute -rotate-45 border-b-3 w-[0.8rem]"></span>
                     </div>
                     <div className="flex flex-col items-center">
-                        <span className="font-bold text-xl text-center">{listing.by || "Default User"}</span>
+                        <span className="font-bold text-xl text-center">{listing._id ? listing.by.username : currUser.username}</span>
                         <span className="font-semibold">{listing._id ? "Edit your Listing" : "Create your Listing"}</span>
                     </div>
                     <div className="flex flex-col w-full relative">

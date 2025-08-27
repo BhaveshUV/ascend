@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const Listing = require("../models/listing");
 const Review = require("../models/review");
+const path = require("path");
+const fs = require("fs");
 
 module.exports.getAll = async (req, res) => {
     try {
@@ -32,12 +34,20 @@ module.exports.getById = async (req, res) => {
 module.exports.updateById = async (req, res) => {
     try {
         const { id } = req.params;
+        console.log("---------req.file--------\n", req.file);
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: "Invalid ID format" });
         }
+        let oldImage = req.body.image;
+        if (req.file) req.body.image = req.file.filename;
+        console.log("req.body after updating req.body.image", req.body);
         let result = await Listing.findOneAndUpdate({ _id: id }, req.body, { returnDocument: "after", runValidators: true });
-        if (!result) {
-            return res.status(404).json({ error: "Listing not found!" });
+        if (!result) return res.status(404).json({ error: "Listing not found!" });
+        if (req.file) {
+            let imagePath = path.join(__dirname, "../uploads", oldImage);
+            fs.unlink(imagePath, (err) => {
+                if (err) console.error("Error deleting listing image", err)
+            });
         }
         res.status(200).send();
     } catch (e) {
@@ -49,6 +59,9 @@ module.exports.updateById = async (req, res) => {
 module.exports.post = async (req, res) => {
     try {
         console.log("Received request.body: ", req.body);
+        console.log("---------req.file--------\n", req.file);
+        if (req.file) req.body.image = req.file.filename;
+        console.log("req.body after updating req.body.image", req.body);
         const createdListing = await Listing.create(req.body);
         if (!createdListing) return res.status(400).json({ error: "Listing creation failed!" });
         res.status(201).send();
@@ -63,6 +76,10 @@ module.exports.deleteById = async (req, res) => {
         let { id } = req.params;
         let deletedListing = await Listing.findOneAndDelete({ _id: id });
         if (!deletedListing) return res.status(404).json({ error: "Listing not found" });
+        let imagePath = path.join(__dirname, "../uploads", deletedListing.image);
+        fs.unlink(imagePath, (err) => {
+            if (err) console.error("Error deleting listing image", err)
+        });
         await Review.deleteMany({ _id: { $in: deletedListing.reviews } });
         res.status(200).send();
     } catch (e) {

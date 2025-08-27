@@ -1,5 +1,5 @@
 const logo = new URL('./ascend-logo-white.png', import.meta.url);
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { FlashContext } from "../contexts/FlashContextProvider";
 import { AuthContext } from "../contexts/AuthContextProvider";
@@ -8,6 +8,7 @@ import { LOGOUT_URL } from "../utils/constants";
 const Header = () => {
     const { flash, setFlashMessage } = useContext(FlashContext);
     const { currUser, setCurrUser, loading } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const logoutHandler = async () => {
         try {
@@ -18,13 +19,24 @@ const Header = () => {
             if (response.ok) {
                 setFlashMessage("success", data.message);
                 setCurrUser(null);
+                navigate("/login");
                 return;
             }
             setFlashMessage("error", data.error);
         } catch (e) {
             setFlashMessage("error", `Request failed: ${e}`);
         }
-    }
+    };
+
+    const authorizationHandler = (e) => {
+        if (loading) {
+            e.preventDefault();
+            setFlashMessage("error", "Try again after a moment");
+        } else if(!loading && !currUser) {
+            e.preventDefault();
+            setFlashMessage("error", "Log in to create, edit and delete");
+        }
+    };
 
     return (
         <div className="sticky top-0 z-10">
@@ -34,7 +46,7 @@ const Header = () => {
                     <div className="max-[736px]:hidden flex gap-6">
                         <NavLink to={"/"} className={({ isActive }) => `border-transparent border-y-2 leading-12 box-border ${isActive ? "text-[#fedf4b] hover:border-b-[#fedf4b]" : "hover:border-b-white hover:text-white"}`} end>Home</NavLink>
                         <NavLink to={"/listings"} className={({ isActive }) => `border-transparent border-y-2 leading-12 box-border ${isActive ? "text-[#fedf4b] hover:border-b-[#fedf4b]" : "hover:border-b-white hover:text-white"}`} end>All Listings</NavLink>
-                        <NavLink to={"/listings/new"} className={({ isActive }) => `border-transparent border-y-2 leading-12 box-border ${isActive ? "text-[#fedf4b] hover:border-b-[#fedf4b]" : "hover:border-b-white hover:text-white"}`} end>Add New Listing</NavLink>
+                        <NavLink to={"/listings/new"} onClick={authorizationHandler} className={({ isActive }) => `border-transparent border-y-2 leading-12 box-border ${isActive ? "text-[#fedf4b] hover:border-b-[#fedf4b]" : "hover:border-b-white hover:text-white"}`} end>Add New Listing</NavLink>
                     </div>
                     <div className="flex gap-2 grow justify-end max-[736px]:hidden">
                         {(!loading && !currUser) && <>
@@ -52,7 +64,7 @@ const Header = () => {
                 <div id="optional-navbar" className="min-[736px]:h-0 max-h-0 flex flex-col px-2 text-zinc-200 overflow-hidden transition-[max-height] duration-300 ease-in-out">
                     <NavLink to={"/"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`} end>Home</NavLink>
                     <NavLink to={"/listings"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`} end>All Listings</NavLink>
-                    <NavLink to={"/listings/new"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`} end>Add New Listing</NavLink>
+                    <NavLink to={"/listings/new"} onClick={(e) => { authorizationHandler(e); document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`} end>Add New Listing</NavLink>
                     {!loading && !currUser && <>
                         <NavLink to={"/login"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`}>Log in</NavLink>
                         <NavLink to={"/signup"} onClick={() => { document.getElementById("optional-navbar").classList.add("max-h-0"); document.getElementById("optional-navbar").classList.remove("max-h-60") }} className={({ isActive }) => `leading-12 ${isActive ? "text-[#fedf4b]" : "hover:text-white"}`}>Sign up</NavLink>

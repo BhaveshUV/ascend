@@ -12,8 +12,6 @@ const ReviewForm = ({ setRefreshListing }) => {
     const navigate = useNavigate();
 
     let createHandler = async (values) => {
-        let { rating, review } = values;
-        let form = { rating, review, by: currUser._id };
         try {
             const response = await fetch(ALL_LISTINGS_URL + `/${id}/reviews`, {
                 method: "POST",
@@ -21,7 +19,7 @@ const ReviewForm = ({ setRefreshListing }) => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(form)
+                body: JSON.stringify(values)
             });
             if (response.ok) {
                 setRefreshListing(prev => !prev);

@@ -15,8 +15,9 @@ const validateUser = (req, res, next) => {
 };
 
 const validateListing = (req, res, next) => {
+    if (!req.body.by) req.body.by = req.user._id.toString();
     let validity = listingSchemaValidation.validate({ listing: req.body });
-    if (!req.body.by) req.body.by = req.user._id;
+    console.log("-------Validity of listing-------");
     console.dir(validity);
     if (validity.error) {
         let errMsg = validity.error.details.map((el) => el.message).join(", ");
@@ -26,6 +27,7 @@ const validateListing = (req, res, next) => {
 };
 
 const validateReview = (req, res, next) => {
+    if (!req.body.by) req.body.by = req.user._id.toString();
     let validity = reviewSchemaValidation.validate({ review: req.body });
     console.dir(validity);
     if (validity.error) {

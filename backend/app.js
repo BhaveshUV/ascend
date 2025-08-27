@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const path = require("path");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
@@ -33,6 +34,7 @@ app.use(cors({
 
 //------------ Enable middlewares for all incoming requests ------------//
 app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
 //------------ Enable cookie-parser for all incoming requests ------------//
 app.use(cookieParser(process.env.SESSION_SECRET));
@@ -72,6 +74,7 @@ app.use("/api/listings/:id/reviews", reviewRouter);
 app.use((err, req, res, next) => {
     const statusCode = Number.isInteger(err.status) ? err.status :
         Number.isInteger(err.statusCode) ? err.statusCode : 500;
+    console.log("-------Error handling middleware-------", err);
     res.status(statusCode).json({ error: err });
 });
 

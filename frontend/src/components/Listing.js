@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import ListingForm from "./ListingForm";
 import ReviewForm from "./ReviewForm";
 import Reviews from "./Reviews";
-import { ALL_LISTINGS_URL, LISTING_IMG_BASE_URL } from "../utils/constants";
+import { ALL_LISTINGS_URL } from "../utils/constants";
 import { FlashContext } from "../contexts/FlashContextProvider";
 import { AuthContext } from "../contexts/AuthContextProvider";
 
@@ -20,10 +20,7 @@ const Listing = () => {
         try {
             let response = await fetch(`${ALL_LISTINGS_URL}/${listing._id}`, {
                 method: "DELETE",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                }
+                credentials: "include"
             });
             if (response.ok) {
                 navigate(-1);
@@ -65,7 +62,7 @@ const Listing = () => {
         !listing ? <div>Loading...</div> :
             isForm ? <ListingForm listingData={listing} setRefreshListing={setRefreshListing} setIsForm={setIsForm} /> : <>
                 <div className="m-auto w-full grow flex flex-col md:flex-row cursor-default relative md:min-h-[70vh] break-words">
-                    <img className={`md:w-[50%] aspect-[16/12] bg-zinc-300 object-cover object-center`} src={LISTING_IMG_BASE_URL + listing.image} alt={listing.title} />
+                    <img className={`md:w-[50%] aspect-[16/12] bg-zinc-300 object-cover object-center`} src={listing.image.url} alt={listing.title} />
                     <div className="md:w-[50%] px-6 py-4 h-full flex flex-col gap-4">
                         <div>
                             <div className="mb-2">

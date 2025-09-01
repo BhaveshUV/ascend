@@ -10,9 +10,14 @@ let listingSchema = new mongoose.Schema({
         required: true
     },
     image: {
-        type: String,
-        default: "https://cdn.pixabay.com/photo/2020/09/24/16/50/board-5599231_1280.png",
-        set: (v) => v === "" ? "https://cdn.pixabay.com/photo/2020/09/24/16/50/board-5599231_1280.png" : v
+        url: {
+            type: String,
+            default: "https://cdn.pixabay.com/photo/2020/09/24/16/50/board-5599231_1280.png",
+            set: (v) => v === "" ? "https://cdn.pixabay.com/photo/2020/09/24/16/50/board-5599231_1280.png" : v
+        },
+        filename: {
+            type: String
+        }
     },
     price: {
         type: Number,

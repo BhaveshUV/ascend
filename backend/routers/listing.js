@@ -3,8 +3,8 @@ const router = express.Router();
 const { validateListing, isUserLoggedIn, isUserListingOwner } = require("../middlewares");
 const listingController = require("../controllers/listingController");
 const multer = require("multer");
-const path = require("path");
-const upload = multer({ dest: path.join(__dirname,"../uploads") });
+const { storage } = require("../cloudConfig");
+const upload = multer({ storage });
 
 router.route("/")
     .get(listingController.getAll)

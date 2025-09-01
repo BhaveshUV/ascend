@@ -2,22 +2,19 @@ const mongoose = require("mongoose");
 const Listing = require("../models/listing");
 const User = require("../models/user");
 const sampleListings = require("./data");
-
-//---------------- Set up MongoDB database connection ----------------//
-async function main() {
-    await mongoose.connect('mongodb://127.0.0.1:27017/ascendApp');
+if (process.env.NODE_ENV !== "production") {
+    require("dotenv").config();
 }
 
-main()
-    .then(() => console.log("Connected to MongoDB server using Mongoose"))
-    .catch(err => console.log(err));
-
 // Initializing the database with users & their listings
-const initDB = async () => {
+async function initDB() {
     try {
-        let res = await Listing.deleteMany({})
+        let res = await Listing.deleteMany({});
+        await User.deleteMany({});
         console.log("Deleted already existing data from DB", res);
 
+        let usersCreated = 0;
+        let listingsCreated = 0;
         for (let listing of sampleListings) {
             const newUser = {
                 username: listing.by,
@@ -26,18 +23,41 @@ const initDB = async () => {
 
             try {
                 const registeredUser = await User.register(newUser, "Password@12345");
+                usersCreated++;
                 await Listing.create({ ...listing, by: registeredUser._id });
+                listingsCreated++;
             } catch (e) {
                 console.error("Error registering the user or creating their listing", e);
             }
         }
-        console.log("Registered all users and created their listings");
+        console.log(`Registered ${usersCreated} user/s and created ${listingsCreated} listing/s`);
     } catch (e) {
-        console.log("Error in initDB: ", e);
+        console.error("Error in initDB: ", e);
+    }
+}
+
+//---------------- Set up MongoDB database connection ----------------//
+async function main() {
+    try{
+        await mongoose.connect(process.env.MONGO_URI, {
+            serverApi: {
+                version: '1',
+                strict: true,
+                deprecationErrors: true
+            }
+        });
+        console.log("Connected to MongoDB server using Mongoose");
+        await initDB();
+    } catch (err) {
+        console.error("Error during DB connection", err);
     } finally {
         await mongoose.connection.close();
         console.log("Closed the DB connection");
     }
 }
 
-initDB();
+main()
+    .catch(err => {
+        console.error(err);
+        process.exit(1);
+    });

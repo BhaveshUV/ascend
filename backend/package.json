@@ -5,11 +5,13 @@
   "description": "ascend backend / Express + Mongoose server",
   "main": "index.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Bhavesh",
   "license": "ISC",
   "dependencies": {
+    "cloudinary": "^1.41.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
@@ -19,6 +21,7 @@
     "method-override": "^3.0.0",
     "mongoose": "^8.16.0",
     "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^4.0.0",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^8.0.0"

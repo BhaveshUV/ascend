@@ -21,11 +21,12 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
         const formData = new FormData();
         formData.append("title", values.title);
         formData.append("description", values.description);
-        formData.append("image", values.image);
+        formData.append("image[url]", values.image.url);
         if (values.imageFile) formData.append("imageFile", imageFile.files[0]);
         formData.append("price", values.price);
         formData.append("location", values.location);
         formData.append("country", values.country);
+
         try {
             const response = await fetch(`${ALL_LISTINGS_URL}/${listing._id}`, {
                 method: "PATCH",
@@ -51,7 +52,7 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
         const formData = new FormData();
         formData.append("title", values.title);
         formData.append("description", values.description);
-        formData.append("image", values.image);
+        formData.append("image[url]", values.image.url);
         if (values.imageFile) formData.append("imageFile", imageFile.files[0]);
         formData.append("price", values.price);
         formData.append("location", values.location);
@@ -95,22 +96,29 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
         if (!loading && currUser && listing._id && (currUser._id !== listing.by._id)) setFlashMessage("error", "You do not have permission for this listing");
     }, [])
 
+    useEffect(() => {
+        return () => {
+            if (preview) {
+                URL.revokeObjectURL(preview);
+                console.log("Blob URL of uploaded image revoked");
+            }
+        };
+    }, [preview])
+
     return (
         <Formik
-            initialValues={{ title: listing.title || '', description: listing.description || '', image: listing.image || '', imageFile: '', price: listing.price || '', location: listing.location || '', country: listing.country || '' }}
+            initialValues={{ title: listing.title || '', description: listing.description || '', image: { url: listing.image?.url || '' }, imageFile: '', price: listing.price || '', location: listing.location || '', country: listing.country || '' }}
             validate={values => {
                 const errors = {};
                 if (!values.title) {
                     errors.title = 'Required';
                 } if (!values.description) {
                     errors.description = 'Required';
-                } if (listing._id && !values.image) {
-                    errors.image = 'Required';
-                }
-                // if (!values.imageFile) {
-                //     errors.imageFile = 'Required';
-                // } 
-                if (!values.price && values.price != '0') {
+                } if (listing._id && !values.image.url) {
+                    errors.image.url = 'Required';
+                } if (values.imageFile && imageFile.files[0].type !== "image/png" && imageFile.files[0].type !== "image/jpeg" && imageFile.files[0].type !== "image/jpg") {
+                    errors.imageFile = 'Only .jpg, .jpeg, .png allowed';
+                } if (!values.price && values.price != '0') {
                     errors.price = 'Required';
                 } else if (values.price <= 0) {
                     errors.price = 'Enter a valid amount';
@@ -161,18 +169,22 @@ const ListingForm = ({ listingData, setRefreshListing, setIsForm }) => {
                     </div>
                     <div className="flex flex-col w-full h-max relative">
                         <label className="w-fit" htmlFor="imgURL">Image URL {listing._id ? <span className="text-red-700">*</span> : null}</label>
-                        <Field id="imgURL" type="text" name="image" className="text-gray-700 px-1 w-full border-2 border-white focus:border-black bg-white text-center rounded" />
-                        {listing._id ? <ErrorMessage name="image" component="span" className="absolute -bottom-3.5 leading-none text-[smaller] w-full text-red-700 italic" /> : null}
+                        <Field id="imgURL" type="text" name="image.url" className="text-gray-700 px-1 w-full border-2 border-white focus:border-black bg-white text-center rounded" />
+                        {listing._id ? <ErrorMessage name="image.url" component="span" className="absolute -bottom-3.5 leading-none text-[smaller] w-full text-red-700 italic" /> : null}
                     </div>
                     <div className="flex flex-col w-full h-max relative">
-                        <label className="w-fit" htmlFor="imageFile">{listing._id ? "Upload New Image" : "Upload Image"}</label>
+                        <label className="w-fit" htmlFor="imageFile">{listing._id ? "Upload New Image (.jpg, .jpeg, .png)" : "Upload Image (.jpg, .jpeg, .png)"}</label>
                         <Field onChange={(e) => {
                             const file = e.currentTarget.files[0];
-                            file ? setPreview(URL.createObjectURL(file)) : setPreview(null);
-                            setFieldValue("imageFile", file);
-                            console.log(file);
+                            if (file && (file.type === "image/png" || file.type === "image/jpeg" || file.type === "image/jpg")) {
+                                setPreview(URL.createObjectURL(file));
+                                setFieldValue("imageFile",  file);
+                            } else {
+                                setPreview(null);
+                                setFieldValue("imageFile", null);
+                            }
                             handleChange(e);
-                        }} id="imageFile" type="file" name="imageFile" className="text-gray-500 px-1 w-full border-2 border-white active:border-black bg-white text-center rounded" />
+                        }} accept=".png, .jpg, .jpeg" id="imageFile" type="file" name="imageFile" className="text-gray-500 px-1 w-full border-2 border-white active:border-black bg-white text-center rounded" />
                         {listing._id ? <ErrorMessage name="imageFile" component="span" className="absolute -bottom-3.5 leading-none text-[smaller] w-full text-red-700 italic" /> : null}
                         {preview && <>
                             <span className="text-sm text-gray-500">You've chosen the following file</span>

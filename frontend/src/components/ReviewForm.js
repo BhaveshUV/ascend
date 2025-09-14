@@ -38,7 +38,6 @@ const ReviewForm = ({ setRefreshListing }) => {
 
     return (
         <div className="m-auto py-4 w-full flex flex-col items-center cursor-default bg-zinc-800 text-white ">
-
             <Formik
                 initialValues={{ rating: "3", review: "" }}
                 validate={values => {

@@ -19,7 +19,7 @@ const Header = () => {
             if (response.ok) {
                 setFlashMessage("success", data.message);
                 setCurrUser(null);
-                navigate("/login");
+                navigate("/");
                 return;
             }
             setFlashMessage("error", data.error);
@@ -40,7 +40,7 @@ const Header = () => {
 
     return (
         <div className="sticky top-0 z-10">
-            <div className="bg-zinc-800 px-2 text-zinc-200 select-none">
+            <div className="bg-zinc-800 px-2 text-zinc-200 select-none text-sm">
                 <div className="py-4 flex gap-8 items-center">
                     <img src={logo} height={58} width={128} />
                     <div className="max-[736px]:hidden flex gap-6">

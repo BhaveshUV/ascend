@@ -1,5 +1,5 @@
-export const ALL_LISTINGS_URL = "http://localhost:8080/api/listings";
-export const SIGNUP_URL = "http://localhost:8080/api/users/signup";
-export const LOGIN_URL = "http://localhost:8080/api/users/login";
-export const LOGGED_IN_USER_URL = "http://localhost:8080/api/users/me";
-export const LOGOUT_URL = "http://localhost:8080/api/users/logout";
+export const ALL_LISTINGS_URL = process.env.ALL_LISTINGS_URL;
+export const SIGNUP_URL = process.env.SIGNUP_URL;
+export const LOGIN_URL = process.env.LOGIN_URL;
+export const LOGGED_IN_USER_URL = process.env.LOGGED_IN_USER_URL;
+export const LOGOUT_URL = process.env.LOGOUT_URL;

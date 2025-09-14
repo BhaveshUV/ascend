@@ -10,10 +10,6 @@ const Footer = () => {
                 <Link to={"https://www.linkedin.com/in/bhavesh-vishwakarma-5316062a1/"} className="hover:text-white"><FontAwesomeIcon icon={faLinkedin} /></Link>
             </div>
             <span className="cursor-default">Ascend</span>
-            <div className="flex gap-4 text-sm">
-                <Link to={"/privacy"} className="hover:text-white">Privacy</Link>
-                <Link to={"/terms"} className="hover:text-white">Terms</Link>
-            </div>
         </div>
     )
 };

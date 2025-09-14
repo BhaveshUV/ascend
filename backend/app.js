@@ -6,6 +6,7 @@ const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
+const MongoStore = require("connect-mongo");
 if (process.env.NODE_ENV !== "production") {
     require("dotenv").config();
 }
@@ -46,7 +47,16 @@ main()
         app.use(cookieParser(process.env.SESSION_SECRET));
 
         //----------- Enable express-session for all incoming requests ----------//
+        const sessionStore = {
+            mongoUrl: process.env.MONGO_URI,
+            crypto: {
+                secret: process.env.SESSION_SECRET
+            },
+            touchAfter: 24 * 3600 // this makes connect-mongo to update session document in db only once every 24 hr unless session data changes
+        }
+
         const sessionOptions = {
+            store: MongoStore.create(sessionStore),
             secret: process.env.SESSION_SECRET,
             resave: false,
             saveUninitialized: false, // true would create empty sessions for every new visitor, even before log in —> confusion

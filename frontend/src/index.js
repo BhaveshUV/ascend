@@ -10,6 +10,7 @@ import ListingForm from "./components/ListingForm";
 import FlashContextProvider from "./contexts/FlashContextProvider";
 import LoginForm from "./components/LoginForm";
 import SignupForm from "./components/SignupForm";
+import Home from "./components/Home";
 import AuthContextProvider from "./contexts/AuthContextProvider";
 
 let appRouter = createBrowserRouter([
@@ -18,6 +19,10 @@ let appRouter = createBrowserRouter([
         element: <App />,
         errorElement: <Error />,
         children: [
+            {
+                path: "/",
+                element: <Home />,
+            },
             {
                 path: "/login",
                 element: <LoginForm />,

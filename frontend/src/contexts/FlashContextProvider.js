@@ -11,7 +11,7 @@ const FlashContextProvider = ({ children }) => {
             clearTimeout(timerRef.current);
         }
         timerRef.current = setTimeout(() => {
-            setFlash({ type: "", message: "" });
+            setFlash(null);
         }, 5000);
     }
 

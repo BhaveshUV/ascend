@@ -37,7 +37,9 @@ main()
         //---------------- Enable CORS for all incoming requests ----------------//
         app.use(cors({
             origin: process.env.FRONTEND_URL || "http://localhost:1234", // Parcel development phase
-            credentials: true // This includes 'Access-Control-Allow-Credentials' in CORS response which requests the browser to store the cookie
+            credentials: true, // This includes 'Access-Control-Allow-Credentials' in CORS response which requests the browser to store the cookie
+            methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+            allowedHeaders: ["Content-Type", "Authorization"] // Allow headers for preflight
         }));
 
         //------------ Enable middlewares for all incoming requests ------------//
